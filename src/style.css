@@ -3,72 +3,136 @@
 @tailwind utilities;
 
 :root {
-  /* Color Palette */
+  /* Color Palette - Warm, baked-goods inspired */
   --color-primary: #78350f; /* Cookie Brown */
   --color-secondary: #d97706; /* Golden Amber */
   --color-accent: #f59e0b; /* Bright Gold */
-  --color-bg: #1c1917; /* Dark Stone */
-  --color-text: #fafaf9; /* Off-White */
+  --color-bg: #1c1917; /* Dark Stone / Chocolate */
+  --color-text: #fafaf9; /* Off-White / Cream */
   --color-surface: #292524; /* Lighter Stone */
   
   /* Typography */
   --font-heading: 'Inter', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 @layer base {
   body {
-    @apply bg-[var(--color-bg)] text-[var(--color-text)] font-sans antialiased selection:bg-[var(--color-accent)] selection:text-black;
+    @apply bg-[var(--color-bg)] text-[var(--color-text)] font-sans antialiased selection:bg-[var(--color-accent)] selection:text-black overflow-x-hidden;
+    font-family: var(--font-body);
   }
   
-  h1, h2, h3 {
+  h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tight;
+    font-family: var(--font-heading);
+  }
+
+  /* Prevent text selection on interactive game elements */
+  .no-select {
+    user-select: none;
+    -webkit-user-select: none;
   }
 }
 
 @layer components {
-  /* Cookie Click Animation */
-  .cookie-click {
-    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Main Cookie Click Animation */
+  .cookie-btn {
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), filter 0.2s ease;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+    cursor: pointer;
+    touch-action: manipulation; /* Improves mobile tap responsiveness */
   }
   
-  .cookie-click:active {
-    transform: scale(0.95);
+  .cookie-btn:hover {
+    transform: scale(1.02);
+    filter: drop-shadow(0 15px 25px rgba(245, 158, 11, 0.2));
   }
 
-  /* Floating Text Animation */
-  .float-up {
+  .cookie-btn:active {
+    transform: scale(0.95);
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
+  }
+
+  /* Floating Text Animation for Clicks */
+  .floating-number {
     animation: floatUp 1s ease-out forwards;
     pointer-events: none;
+    position: absolute;
+    color: var(--color-accent);
+    font-weight: 900;
+    font-size: 1.75rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(245, 158, 11, 0.4);
+    z-index: 50;
+    font-family: var(--font-mono);
   }
 
   @keyframes floatUp {
-    0% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-100px); }
+    0% { 
+      opacity: 1; 
+      transform: translateY(0) scale(1); 
+    }
+    100% { 
+      opacity: 0; 
+      transform: translateY(-120px) scale(1.2); 
+    }
   }
 
-  /* Glassmorphism Cards */
-  .card {
-    @apply bg-[var(--color-surface)] border border-white/10 rounded-2xl p-6 shadow-xl;
+  /* Glassmorphism Cards & Panels */
+  .panel {
+    @apply bg-[var(--color-surface)] border border-white/5 rounded-2xl p-6 shadow-2xl backdrop-blur-sm;
+  }
+
+  /* Store Item / Upgrade Card */
+  .upgrade-card {
+    @apply flex items-center justify-between p-4 rounded-xl bg-black/20 border border-white/5 hover:bg-black/40 hover:border-[var(--color-secondary)]/50 transition-all duration-200 cursor-pointer select-none;
+  }
+
+  .upgrade-card.disabled {
+    @apply opacity-50 grayscale cursor-not-allowed hover:bg-black/20 hover:border-white/5;
   }
 
   /* Button Styles */
   .btn-primary {
-    @apply bg-[var(--color-secondary)] hover:bg-[var(--color-accent)] text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-[var(--color-secondary)] hover:bg-[var(--color-accent)] text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-[var(--color-secondary)]/20;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border-2 border-[var(--color-secondary)] text-[var(--color-secondary)] hover:bg-[var(--color-secondary)] hover:text-white font-bold py-2 px-4 rounded-lg transition-all duration-200;
   }
 }
 
-/* Scrollbar Styling */
+/* Custom Scrollbar for Store & Leaderboard */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-bg);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-surface);
+  background: var(--color-primary);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-secondary);
+}
+
+/* Toast Notification Animation */
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.toast-enter {
+  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.toast-exit {
+  animation: fadeOut 0.3s ease-in forwards;
 }
