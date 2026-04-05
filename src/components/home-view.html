@@ -1,0 +1,128 @@
+import { Plant } from '../types';
+import { generatePlantCatalog } from '../utils';
+import { renderPlantCard } from './plant-card';
+
+/**
+ * Renders the Home Page view.
+ * This component includes a hero section, a featured plants grid, 
+ * and a value proposition section.
+ * 
+ * @param container - The HTMLElement where the home view will be rendered.
+ */
+export function renderHomeView(container: HTMLElement): void {
+  // Clear existing content
+  container.innerHTML = '';
+
+  // Create the main wrapper for the home view
+  const homeWrapper = document.createElement('div');
+  homeWrapper.className = 'flex flex-col gap-16 pb-20 animate-in fade-in duration-700';
+
+  // 1. Hero Section
+  const heroSection = document.createElement('section');
+  heroSection.className = 'relative w-full min-h-[70vh] flex items-center justify-center overflow-hidden rounded-3xl mt-4';
+  heroSection.innerHTML = `
+    <div class="absolute inset-0 z-0">
+      <img 
+        src="https://images.unsplash.com/photo-1470058869958-2a77a617123f?auto=format&fit=crop&w=2000&q=80" 
+        alt="Lush green plants background" 
+        class="w-full h-full object-cover brightness-[0.65]"
+      />
+    </div>
+    <div class="relative z-10 container-inner text-center text-white px-6">
+      <h1 class="text-5xl md:text-7xl font-bold font-[var(--font-heading)] mb-6 leading-tight text-balance">
+        Bring Nature <span class="text-[var(--color-secondary)]">Indoors</span>
+      </h1>
+      <p class="text-lg md:text-xl max-w-2xl mx-auto mb-10 text-gray-100 text-balance">
+        Discover a curated collection of premium indoor plants delivered straight to your doorstep. 
+        Transform your living space into a sanctuary today.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="/shop" class="btn btn-primary px-8 py-4 text-lg shadow-xl hover:scale-105 transition-transform" data-link>
+          Shop Collection
+        </a>
+        <a href="#featured" class="btn bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-4 text-lg hover:bg-white/20 transition-all">
+          View Featured
+        </a>
+      </div>
+    </div>
+  `;
+
+  // 2. Featured Section
+  const featuredSection = document.createElement('section');
+  featuredSection.id = 'featured';
+  featuredSection.className = 'container-inner py-12';
+  
+  const featuredHeader = document.createElement('div');
+  featuredHeader.className = 'flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4';
+  featuredHeader.innerHTML = `
+    <div>
+      <h2 class="text-3xl md:text-4xl font-bold font-[var(--font-heading)] text-[var(--color-text)]">Featured Arrivals</h2>
+      <p class="text-[var(--color-text-muted)] mt-2">Hand-picked favorites for your home office or living room.</p>
+    </div>
+    <a href="/shop" class="text-[var(--color-primary)] font-semibold flex items-center gap-2 hover:underline" data-link>
+      Browse all plants
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+    </a>
+  `;
+
+  const plantGrid = document.createElement('div');
+  plantGrid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8';
+
+  // Generate 3 random plants for the featured section
+  const featuredPlants: Plant[] = generatePlantCatalog(3);
+  featuredPlants.forEach(plant => {
+    const card = renderPlantCard(plant);
+    plantGrid.appendChild(card);
+  });
+
+  featuredSection.appendChild(featuredHeader);
+  featuredSection.appendChild(plantGrid);
+
+  // 3. Value Proposition Section
+  const benefitsSection = document.createElement('section');
+  benefitsSection.className = 'bg-[var(--color-primary)] text-white py-20 rounded-[3rem] mx-4 md:mx-8';
+  benefitsSection.innerHTML = `
+    <div class="container-inner">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+        <div class="flex flex-col items-center">
+          <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[var(--color-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3 font-[var(--font-heading)]">Guaranteed Healthy</h3>
+          <p class="text-white/80 leading-relaxed">Every plant is hand-picked and inspected by our botanists before shipping to ensure it arrives in peak condition.</p>
+        </div>
+        
+        <div class="flex flex-col items-center">
+          <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[var(--color-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3 font-[var(--font-heading)]">Fast & Safe Delivery</h3>
+          <p class="text-white/80 leading-relaxed">Our specialized eco-friendly packaging keeps your plants secure and hydrated during their journey to your home.</p>
+        </div>
+        
+        <div class="flex flex-col items-center">
+          <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[var(--color-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3 font-[var(--font-heading)]">Expert Care Support</h3>
+          <p class="text-white/80 leading-relaxed">New to plant parenting? Our experts are available 24/7 to help you with watering schedules and sunlight tips.</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Assemble the view
+  homeWrapper.appendChild(heroSection);
+  homeWrapper.appendChild(featuredSection);
+  homeWrapper.appendChild(benefitsSection);
+
+  container.appendChild(homeWrapper);
+}
