@@ -1,0 +1,126 @@
+import { generateRandomProducts } from '../utils';
+import { createProductCard } from '../components/productCard';
+
+/**
+ * Renders the Home page view into the provided container.
+ * Includes a hero section, a "How it Works" section, and a featured products grid.
+ * 
+ * @param container - The DOM element to mount the home view into.
+ */
+export function renderHomeView(container: HTMLElement): void {
+  // Clear the container before rendering new content
+  container.innerHTML = '';
+
+  // Create a wrapper for the home page content
+  const wrapper = document.createElement('div');
+  wrapper.className = 'w-full flex flex-col animate-fade-in';
+
+  // 1. Hero Section
+  const heroHTML = `
+    <section class="relative bg-[var(--color-primary)] text-white overflow-hidden rounded-3xl mx-4 sm:mx-6 lg:mx-8 mt-6 mb-16 shadow-xl">
+      <!-- Decorative background elements -->
+      <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-[var(--color-secondary)] rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+        <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-[var(--color-accent)] rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+      </div>
+      
+      <div class="relative z-10 px-6 py-16 sm:py-24 lg:px-16 lg:py-32 flex flex-col items-center text-center">
+        <span class="text-[var(--color-accent)] font-bold tracking-wider uppercase text-sm mb-4">Botanical Roulette</span>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 font-heading text-white leading-tight">
+          Embrace the <span class="text-[var(--color-accent)]">Surprise</span>.
+        </h1>
+        <p class="mt-4 text-lg sm:text-xl max-w-2xl text-gray-200 mb-10 leading-relaxed">
+          You pick the pot. We plant the seed. What grows is a complete mystery until it sprouts. Add a little unpredictable nature to your home.
+        </p>
+        <a href="/shop" data-link class="btn-accent text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all">
+          Shop Mystery Pots
+        </a>
+      </div>
+    </section>
+  `;
+
+  // 2. How It Works Section
+  const howItWorksHTML = `
+    <section class="bg-white py-16 border-y border-gray-100 mb-16">
+      <div class="container-inner">
+        <h2 class="text-3xl font-bold text-center text-[var(--color-primary)] font-heading mb-12">How It Works</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+          
+          <!-- Step 1 -->
+          <div class="flex flex-col items-center">
+            <div class="w-16 h-16 rounded-full bg-[var(--color-bg)] flex items-center justify-center mb-6 shadow-sm text-[var(--color-primary)]">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-[var(--color-text)] mb-3 font-heading">1. Choose a Pot</h3>
+            <p class="text-[var(--color-text)]/70">Select from our curated collection of premium terracotta, ceramic, and eco-resin pots.</p>
+          </div>
+          
+          <!-- Step 2 -->
+          <div class="flex flex-col items-center">
+            <div class="w-16 h-16 rounded-full bg-[var(--color-bg)] flex items-center justify-center mb-6 shadow-sm text-[var(--color-secondary)]">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-[var(--color-text)] mb-3 font-heading">2. We Plant a Mystery</h3>
+            <p class="text-[var(--color-text)]/70">Our botanists select a random, healthy seed or cutting and plant it in your chosen vessel.</p>
+          </div>
+          
+          <!-- Step 3 -->
+          <div class="flex flex-col items-center">
+            <div class="w-16 h-16 rounded-full bg-[var(--color-bg)] flex items-center justify-center mb-6 shadow-sm text-[var(--color-accent)]">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-[var(--color-text)] mb-3 font-heading">3. Watch it Grow</h3>
+            <p class="text-[var(--color-text)]/70">Care for your new friend and discover what beautiful plant unfolds over time.</p>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+  `;
+
+  // 3. Featured Products Section
+  const featuredHTML = `
+    <section class="container-inner mb-20">
+      <div class="flex justify-between items-end mb-8">
+        <div>
+          <h2 class="text-3xl font-bold text-[var(--color-primary)] font-heading">Featured Mysteries</h2>
+          <p class="text-[var(--color-text)]/70 mt-2">Our most popular unknown botanical wonders.</p>
+        </div>
+        <a href="/shop" data-link class="hidden sm:inline-flex text-[var(--color-secondary)] font-medium hover:text-[var(--color-primary)] transition-colors">
+          View all &rarr;
+        </a>
+      </div>
+      
+      <!-- Grid container for dynamically injected product cards -->
+      <div id="featured-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Product cards will be appended here -->
+      </div>
+      
+      <div class="mt-8 text-center sm:hidden">
+         <a href="/shop" data-link class="inline-flex text-[var(--color-secondary)] font-medium hover:text-[var(--color-primary)] transition-colors">
+          View all &rarr;
+        </a>
+      </div>
+    </section>
+  `;
+
+  // Combine all sections and append to the wrapper
+  wrapper.innerHTML = heroHTML + howItWorksHTML + featuredHTML;
+  container.appendChild(wrapper);
+
+  // Dynamically generate and inject 3 featured products
+  const featuredGrid = wrapper.querySelector('#featured-grid');
+  if (featuredGrid) {
+    const featuredProducts = generateRandomProducts(3);
+    featuredProducts.forEach(product => {
+      const card = createProductCard(product);
+      featuredGrid.appendChild(card);
+    });
+  }
+}
