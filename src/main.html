@@ -1,0 +1,112 @@
+import './style.css';
+import { Route } from './types';
+
+// Layout Components
+import { renderHeader } from './components/header';
+import { renderFooter } from './components/footer';
+
+// Page Views
+import { renderHomeView } from './pages/home';
+import { renderShopView } from './pages/shop';
+import { renderCheckoutView } from './pages/checkout';
+import { renderTosView } from './pages/tos';
+
+/**
+ * Define the application's routing table.
+ * Maps URL paths to their respective render functions.
+ */
+const routes: Route[] = [
+  { path: '/', render: renderHomeView },
+  { path: '/shop', render: renderShopView },
+  { path: '/checkout', render: renderCheckoutView },
+  { path: '/tos', render: renderTosView }
+];
+
+/**
+ * Handles the client-side routing logic.
+ * Matches the current URL pathname to a route and renders the corresponding view.
+ * 
+ * @param mainContainer - The DOM element where page content should be injected.
+ */
+function router(mainContainer: HTMLElement): void {
+  const path = window.location.pathname;
+  
+  // Find matching route, fallback to Home if not found (simple 404 handling)
+  const route = routes.find(r => r.path === path) || routes[0];
+  
+  // Clear the current view
+  mainContainer.innerHTML = '';
+  
+  // Render the new view
+  route.render(mainContainer);
+}
+
+/**
+ * Programmatically navigates to a new URL without reloading the page.
+ * 
+ * @param url - The target URL path.
+ * @param mainContainer - The DOM element where page content should be injected.
+ */
+function navigateTo(url: string, mainContainer: HTMLElement): void {
+  window.history.pushState(null, '', url);
+  router(mainContainer);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * Initializes the application.
+ * Sets up the global layout, attaches routing event listeners, and triggers the initial render.
+ */
+export async function initApp(): Promise<void> {
+  const app = document.getElementById('app');
+  
+  if (!app) {
+    console.error('Critical Error: Root element #app not found in index.html');
+    return;
+  }
+
+  // 1. Create the base layout structure
+  const headerContainer = document.createElement('div');
+  const mainContainer = document.createElement('main');
+  const footerContainer = document.createElement('div');
+
+  // Apply layout classes (flex-grow ensures main takes up available space between header and footer)
+  mainContainer.className = 'flex-grow flex flex-col w-full relative';
+  
+  // Assemble the layout
+  app.appendChild(headerContainer);
+  app.appendChild(mainContainer);
+  app.appendChild(footerContainer);
+
+  // 2. Render static layout components (Header & Footer)
+  renderHeader(headerContainer);
+  renderFooter(footerContainer);
+
+  // 3. Setup global event listener for SPA navigation
+  // We use event delegation on the body to catch all clicks on elements with the 'data-link' attribute
+  document.body.addEventListener('click', (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    const link = target.closest('[data-link]') as HTMLAnchorElement;
+    
+    if (link && link.href) {
+      e.preventDefault();
+      const url = new URL(link.href).pathname;
+      navigateTo(url, mainContainer);
+    }
+  });
+
+  // 4. Handle browser back/forward button navigation
+  window.addEventListener('popstate', () => {
+    router(mainContainer);
+  });
+
+  // 5. Trigger the initial route render based on the current URL
+  router(mainContainer);
+}
+
+// Boot the application once the DOM is fully loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
