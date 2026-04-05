@@ -1,0 +1,89 @@
+/**
+ * Renders the global footer component.
+ * Includes branding, quick navigation, and legal links (TOS).
+ * 
+ * @param container - The HTMLElement where the footer will be rendered.
+ */
+export function renderFooter(container: HTMLElement): void {
+  const currentYear = new Date().getFullYear();
+
+  container.innerHTML = `
+    <footer class="bg-[var(--color-primary)] text-[var(--color-bg)] py-12 mt-auto border-t-4 border-[var(--color-secondary)]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
+          
+          <!-- Brand & Mission -->
+          <div class="col-span-1">
+            <a href="/" class="flex items-center gap-3 mb-4 group w-max" data-link>
+              <div class="w-10 h-10 bg-[var(--color-secondary)] rounded-xl flex items-center justify-center text-white transition-transform duration-300 group-hover:-rotate-12 shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <span class="text-2xl font-serif font-bold tracking-tight text-[var(--color-bg)]">
+                MysteryRoots
+              </span>
+            </a>
+            <p class="text-sm text-[var(--color-bg)]/80 leading-relaxed max-w-xs">
+              Embrace the surprise. We plant the seeds, you provide the love, and nature does the rest. What will you grow today?
+            </p>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="col-span-1">
+            <h3 class="text-lg font-bold font-[var(--font-heading)] mb-4 text-[var(--color-accent)] tracking-wide">Explore</h3>
+            <ul class="space-y-3">
+              <li>
+                <a href="/" class="text-sm font-medium text-[var(--color-bg)]/80 hover:text-[var(--color-accent)] hover:translate-x-1 inline-block transition-all duration-200" data-link>
+                  Home
+                </a>
+              </li>
+              <li>
+                <a href="/shop" class="text-sm font-medium text-[var(--color-bg)]/80 hover:text-[var(--color-accent)] hover:translate-x-1 inline-block transition-all duration-200" data-link>
+                  Shop Mystery Pots
+                </a>
+              </li>
+              <li>
+                <a href="/checkout" class="text-sm font-medium text-[var(--color-bg)]/80 hover:text-[var(--color-accent)] hover:translate-x-1 inline-block transition-all duration-200" data-link>
+                  Your Cart
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Legal & Support -->
+          <div class="col-span-1">
+            <h3 class="text-lg font-bold font-[var(--font-heading)] mb-4 text-[var(--color-accent)] tracking-wide">Support</h3>
+            <ul class="space-y-3">
+              <li>
+                <a href="/tos" class="text-sm font-medium text-[var(--color-bg)]/80 hover:text-[var(--color-accent)] hover:translate-x-1 inline-block transition-all duration-200" data-link>
+                  Terms of Service
+                </a>
+              </li>
+              <li>
+                <a href="/tos" class="text-sm font-medium text-[var(--color-bg)]/80 hover:text-[var(--color-accent)] hover:translate-x-1 inline-block transition-all duration-200" data-link>
+                  Our Guarantee
+                </a>
+              </li>
+              <li>
+                <a href="/tos" class="text-sm font-medium text-[var(--color-bg)]/80 hover:text-[var(--color-accent)] hover:translate-x-1 inline-block transition-all duration-200" data-link>
+                  Privacy Policy
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="mt-12 pt-8 border-t border-[var(--color-bg)]/20 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p class="text-xs text-[var(--color-bg)]/60 font-medium">
+            &copy; ${currentYear} MysteryRoots. All rights reserved.
+          </p>
+          <p class="text-xs text-[var(--color-bg)]/60 font-medium flex items-center gap-1">
+            Grown with <span class="text-[var(--color-accent)] text-sm">♥</span> and a little bit of luck.
+          </p>
+        </div>
+      </div>
+    </footer>
+  `;
+}
