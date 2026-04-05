@@ -1,0 +1,98 @@
+/**
+ * Renders the Terms of Service page view into the provided container.
+ * Details the specific policies regarding the purchase of mystery plants.
+ * 
+ * @param container - The DOM element to mount the TOS view into.
+ */
+export function renderTosView(container: HTMLElement): void {
+  // Clear the container before rendering new content
+  container.innerHTML = '';
+
+  // Create a wrapper for the TOS page content
+  const wrapper = document.createElement('div');
+  wrapper.className = 'w-full flex flex-col animate-fade-in container-inner py-12 md:py-20 min-h-screen';
+
+  const tosHTML = `
+    <div class="max-w-3xl mx-auto w-full bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100">
+      
+      <div class="text-center mb-12">
+        <div class="w-16 h-16 bg-[var(--color-bg)] rounded-full flex items-center justify-center mx-auto mb-6 text-[var(--color-primary)]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold text-[var(--color-primary)] font-heading mb-4">Terms of Service & Policies</h1>
+        <p class="text-[var(--color-text)]/70">Last updated: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      </div>
+
+      <div class="space-y-10 text-[var(--color-text)]/80 leading-relaxed">
+        
+        <section>
+          <h2 class="text-2xl font-bold text-[var(--color-primary)] font-heading mb-4 border-b border-gray-100 pb-2">1. The "Mystery" Agreement</h2>
+          <p class="mb-4">
+            By purchasing from The Mystery Nursery, you acknowledge and agree that the specific species, genus, or variety of the plant you receive is entirely randomized. You are purchasing a vessel (pot) and the service of us planting a healthy, viable seed or cutting within it.
+          </p>
+          <p>
+            We do not accept returns, exchanges, or issue refunds simply because you do not like the plant that eventually grows. Embracing the surprise is the core experience of our store.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-[var(--color-primary)] font-heading mb-4 border-b border-gray-100 pb-2">2. Healthy Sprout Guarantee</h2>
+          <p class="mb-4">
+            We guarantee that every pot contains a viable, healthy seed or cutting. If your mystery plant fails to show any signs of growth within <strong>30 days</strong> of delivery (despite following general care instructions), we will ship you a replacement mystery seed/cutting free of charge.
+          </p>
+          <p>
+            To claim this guarantee, please contact our support team with your order number and a photo of the undisturbed soil/pot.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-[var(--color-primary)] font-heading mb-4 border-b border-gray-100 pb-2">3. Pet & Child Safety Warning</h2>
+          <div class="bg-[var(--color-accent)]/10 border-l-4 border-[var(--color-accent)] p-4 rounded-r-lg mb-4 text-[var(--color-text)]">
+            <strong>Important:</strong> Because the plant is a mystery, we cannot guarantee that it will be non-toxic to cats, dogs, or other pets.
+          </div>
+          <p>
+            Once your plant sprouts and develops identifiable leaves, we strongly recommend using a plant identification app to determine its species. Until you have positively identified the plant as pet-safe, please keep it out of reach of children and animals. The Mystery Nursery is not liable for any harm caused by the ingestion of our plants.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-[var(--color-primary)] font-heading mb-4 border-b border-gray-100 pb-2">4. Shipping & Handling</h2>
+          <p class="mb-4">
+            All pots are carefully packaged to prevent breakage during transit. The soil is secured, and the seed/cutting is planted at the appropriate depth prior to shipping. 
+          </p>
+          <p>
+            If your pot arrives broken or damaged, please contact us within 48 hours of delivery with photographic evidence, and we will issue a full replacement or refund for the damaged items.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-[var(--color-primary)] font-heading mb-4 border-b border-gray-100 pb-2">5. General Returns</h2>
+          <p>
+            Due to the living nature of our products, we do not accept general returns. If you wish to cancel your order, you must do so within 12 hours of placement, before the order has been processed and planted. Once an order is marked as "Planted" or "Shipped," it cannot be cancelled.
+          </p>
+        </section>
+
+        <div class="mt-12 pt-8 border-t border-gray-200 text-center">
+          <p class="text-sm text-[var(--color-text)]/60 mb-6">
+            If you have any questions about these terms, please contact us before placing your order.
+          </p>
+          <a href="/shop" data-link class="btn-primary px-8 py-3 rounded-full inline-flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+            </svg>
+            Back to Shop
+          </a>
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  wrapper.innerHTML = tosHTML;
+  container.appendChild(wrapper);
+  
+  // Scroll to top when rendering this view
+  window.scrollTo(0, 0);
+}
