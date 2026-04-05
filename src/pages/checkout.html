@@ -1,0 +1,286 @@
+import { getCartItems, getCartTotal, formatCurrency, clearCart } from '../utils';
+
+/**
+ * Renders the Checkout page view into the provided container.
+ * Displays the cart summary and a mock checkout form.
+ * 
+ * @param container - The DOM element to mount the checkout view into.
+ */
+export function renderCheckoutView(container: HTMLElement): void {
+  // Clear the container before rendering new content
+  container.innerHTML = '';
+
+  const cartItems = getCartItems();
+  const wrapper = document.createElement('div');
+  wrapper.className = 'w-full flex flex-col animate-fade-in container-inner py-12 min-h-[70vh]';
+
+  // Handle Empty Cart State
+  if (cartItems.length === 0) {
+    wrapper.innerHTML = `
+      <div class="flex flex-col items-center justify-center text-center py-20 px-4 bg-white rounded-2xl shadow-sm border border-gray-100 max-w-2xl mx-auto w-full">
+        <div class="w-24 h-24 bg-[var(--color-bg)] rounded-full flex items-center justify-center mb-6 text-[var(--color-accent)]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-[var(--color-primary)] font-heading mb-4">Your cart is empty</h1>
+        <p class="text-lg text-[var(--color-text)]/70 mb-8 max-w-md">
+          Looks like you haven't selected a mystery pot yet. Let's find the perfect vessel for your surprise plant.
+        </p>
+        <a href="/shop" data-link class="btn-primary text-lg px-8 py-3 rounded-full shadow-md">
+          Explore the Nursery
+        </a>
+      </div>
+    `;
+    container.appendChild(wrapper);
+    return;
+  }
+
+  // Calculate totals
+  const subtotal = getCartTotal();
+  const shipping = subtotal > 50 ? 0 : 8.99; // Free shipping over $50
+  const total = subtotal + shipping;
+
+  // Generate Cart Items HTML
+  const cartItemsHTML = cartItems.map(item => `
+    <div class="flex items-center gap-4 py-4 border-b border-gray-100 last:border-0">
+      <div class="w-16 h-16 bg-[var(--color-bg)] rounded-md flex items-center justify-center p-2 flex-shrink-0">
+        ${item.product.imageUrl 
+          ? `<img src="${item.product.imageUrl}" alt="${item.product.name}" class="w-full h-full object-contain" />`
+          : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-8 h-8 opacity-50">
+              <path d="M12 6v-4c0-1.5-1.5-2-3-2s-3 .5-3 2c0 2 2 3 4 3h2z" fill="var(--color-secondary)"/>
+              <path d="M5 9h14l-1.5 13H6.5L5 9z" fill="var(--color-accent)"/>
+            </svg>`
+        }
+      </div>
+      <div class="flex-grow">
+        <h4 class="text-sm font-bold text-[var(--color-text)]">${item.product.name}</h4>
+        <p class="text-xs text-[var(--color-text)]/60">Qty: ${item.quantity} &times; ${formatCurrency(item.product.price)}</p>
+      </div>
+      <div class="font-medium text-[var(--color-primary)]">
+        ${formatCurrency(item.product.price * item.quantity)}
+      </div>
+    </div>
+  `).join('');
+
+  // Main Checkout Layout
+  wrapper.innerHTML = `
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold text-[var(--color-primary)] font-heading">Secure Checkout</h1>
+      <p class="text-[var(--color-text)]/70 mt-2">Almost there! Just a few details before we plant your mystery.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      
+      <!-- Checkout Form (Left Column) -->
+      <div class="lg:col-span-7 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+        <form id="checkout-form" class="space-y-8">
+          
+          <!-- Contact Info -->
+          <section>
+            <h2 class="text-xl font-bold text-[var(--color-primary)] font-heading mb-4 flex items-center gap-2">
+              <span class="bg-[var(--color-bg)] text-[var(--color-secondary)] w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+              Contact Information
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label for="email" class="block text-sm font-medium text-[var(--color-text)]">Email Address</label>
+                <input type="email" id="email" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white" placeholder="you@example.com">
+              </div>
+              <div class="space-y-1">
+                <label for="phone" class="block text-sm font-medium text-[var(--color-text)]">Phone Number (Optional)</label>
+                <input type="tel" id="phone" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white" placeholder="(555) 123-4567">
+              </div>
+            </div>
+          </section>
+
+          <!-- Shipping Address -->
+          <section>
+            <h2 class="text-xl font-bold text-[var(--color-primary)] font-heading mb-4 flex items-center gap-2">
+              <span class="bg-[var(--color-bg)] text-[var(--color-secondary)] w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+              Shipping Address
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label for="firstName" class="block text-sm font-medium text-[var(--color-text)]">First Name</label>
+                <input type="text" id="firstName" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white">
+              </div>
+              <div class="space-y-1">
+                <label for="lastName" class="block text-sm font-medium text-[var(--color-text)]">Last Name</label>
+                <input type="text" id="lastName" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white">
+              </div>
+              <div class="space-y-1 md:col-span-2">
+                <label for="address" class="block text-sm font-medium text-[var(--color-text)]">Street Address</label>
+                <input type="text" id="address" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white" placeholder="123 Botanical Way">
+              </div>
+              <div class="space-y-1">
+                <label for="city" class="block text-sm font-medium text-[var(--color-text)]">City</label>
+                <input type="text" id="city" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white">
+              </div>
+              <div class="space-y-1 grid grid-cols-2 gap-4">
+                <div>
+                  <label for="state" class="block text-sm font-medium text-[var(--color-text)]">State</label>
+                  <input type="text" id="state" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white">
+                </div>
+                <div>
+                  <label for="zip" class="block text-sm font-medium text-[var(--color-text)]">ZIP Code</label>
+                  <input type="text" id="zip" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white">
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Payment (Mock) -->
+          <section>
+            <h2 class="text-xl font-bold text-[var(--color-primary)] font-heading mb-4 flex items-center gap-2">
+              <span class="bg-[var(--color-bg)] text-[var(--color-secondary)] w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
+              Payment Details
+            </h2>
+            <div class="bg-[var(--color-bg)] p-4 rounded-lg border border-gray-200 mb-4">
+              <p class="text-sm text-[var(--color-text)]/80 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[var(--color-secondary)]" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                </svg>
+                This is a mock checkout. No real payment will be processed.
+              </p>
+            </div>
+            <div class="space-y-4">
+              <div class="space-y-1">
+                <label for="cardName" class="block text-sm font-medium text-[var(--color-text)]">Name on Card</label>
+                <input type="text" id="cardName" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white">
+              </div>
+              <div class="space-y-1">
+                <label for="cardNumber" class="block text-sm font-medium text-[var(--color-text)]">Card Number</label>
+                <input type="text" id="cardNumber" required placeholder="0000 0000 0000 0000" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white font-mono">
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label for="expDate" class="block text-sm font-medium text-[var(--color-text)]">Expiry Date</label>
+                  <input type="text" id="expDate" required placeholder="MM/YY" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white">
+                </div>
+                <div class="space-y-1">
+                  <label for="cvv" class="block text-sm font-medium text-[var(--color-text)]">CVV</label>
+                  <input type="text" id="cvv" required placeholder="123" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white">
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <button type="submit" class="w-full btn-primary py-4 text-lg rounded-xl shadow-lg mt-8 flex justify-center items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+            </svg>
+            Pay ${formatCurrency(total)}
+          </button>
+          
+          <p class="text-xs text-center text-gray-500 mt-4">
+            By placing your order, you agree to our <a href="/tos" data-link class="text-[var(--color-secondary)] underline">Terms of Service</a> and acknowledge that the plant you receive is a complete mystery.
+          </p>
+        </form>
+      </div>
+
+      <!-- Order Summary (Right Column) -->
+      <div class="lg:col-span-5 lg:sticky lg:top-24">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+          <h2 class="text-xl font-bold text-[var(--color-primary)] font-heading mb-6">Order Summary</h2>
+          
+          <div class="max-h-64 overflow-y-auto pr-2 mb-6 space-y-2 custom-scrollbar">
+            ${cartItemsHTML}
+          </div>
+          
+          <div class="space-y-3 pt-6 border-t border-gray-100">
+            <div class="flex justify-between text-[var(--color-text)]/80">
+              <span>Subtotal</span>
+              <span class="font-medium">${formatCurrency(subtotal)}</span>
+            </div>
+            <div class="flex justify-between text-[var(--color-text)]/80">
+              <span>Shipping</span>
+              <span class="font-medium">${shipping === 0 ? '<span class="text-[var(--color-secondary)]">Free</span>' : formatCurrency(shipping)}</span>
+            </div>
+            ${shipping > 0 ? `
+              <div class="text-xs text-[var(--color-accent)] text-right">
+                Add ${formatCurrency(50 - subtotal)} more for free shipping!
+              </div>
+            ` : ''}
+            
+            <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-200">
+              <span class="text-lg font-bold text-[var(--color-primary)]">Total</span>
+              <span class="text-2xl font-bold text-[var(--color-primary)]">${formatCurrency(total)}</span>
+            </div>
+          </div>
+
+          <!-- Trust Badge -->
+          <div class="mt-8 bg-[var(--color-bg)] p-4 rounded-xl flex items-start gap-3">
+            <div class="text-[var(--color-secondary)] mt-0.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-[var(--color-primary)]">Healthy Sprout Guarantee</h4>
+              <p class="text-xs text-[var(--color-text)]/70 mt-1">If your mystery seed doesn't sprout within 30 days, we'll send you a new one for free.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  `;
+
+  container.appendChild(wrapper);
+
+  // Handle Form Submission
+  const form = wrapper.querySelector('#checkout-form') as HTMLFormElement;
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Simulate processing time
+      const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const originalBtnText = submitBtn.innerHTML;
+      
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Processing...
+      `;
+      submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+
+      setTimeout(() => {
+        // Clear the cart
+        clearCart();
+        
+        // Dispatch custom event to update header cart count
+        window.dispatchEvent(new Event('cart-updated'));
+
+        // Render Success State
+        container.innerHTML = `
+          <div class="w-full flex flex-col items-center justify-center text-center py-20 px-4 animate-fade-in min-h-[60vh]">
+            <div class="w-24 h-24 bg-[var(--color-secondary)]/10 rounded-full flex items-center justify-center mb-6 text-[var(--color-secondary)]">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-[var(--color-primary)] font-heading mb-4">Order Confirmed!</h1>
+            <p class="text-lg text-[var(--color-text)]/70 mb-8 max-w-md">
+              Your mystery pot is being prepared. We'll email you the tracking details once it ships. Get ready for a surprise!
+            </p>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 w-full max-w-sm">
+              <p class="text-sm text-[var(--color-text)]/60 mb-1">Order Number</p>
+              <p class="text-xl font-mono font-bold text-[var(--color-primary)]">#MYST-${Math.floor(10000 + Math.random() * 90000)}</p>
+            </div>
+            <a href="/" data-link class="btn-outline px-8 py-3 rounded-full">
+              Return Home
+            </a>
+          </div>
+        `;
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 1500);
+    });
+  }
+}
