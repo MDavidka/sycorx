@@ -1,0 +1,60 @@
+/**
+ * Shared TypeScript interfaces and types for the Mystery Plant Shop.
+ */
+
+export interface SiteConfig {
+  title: string;
+  description: string;
+  contactEmail: string;
+}
+
+export interface NavItem {
+  label: string;
+  href: string;
+}
+
+export type PotSize = 'Small' | 'Medium' | 'Large' | 'Extra Large';
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  potSize: PotSize;
+  /** 
+   * The exact plant is a mystery, but we can hint at the care difficulty 
+   * or keep it a complete surprise.
+   */
+  difficultyHint: 'Easy' | 'Moderate' | 'Expert' | 'Complete Mystery';
+}
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+export interface AppState {
+  cart: CartItem[];
+}
+
+/**
+ * Represents a route in our vanilla TS mesh routing system.
+ */
+export interface Route {
+  path: string;
+  /**
+   * The render function responsible for injecting the page's HTML 
+   * and attaching event listeners into the provided container.
+   */
+  render: (container: HTMLElement) => void | Promise<void>;
+}
+
+/**
+ * Props for the Product Card component
+ */
+export interface ProductCardProps {
+  product: Product;
+  /** Callback when the "Add to Cart" button is clicked */
+  onAddToCart: (product: Product) => void;
+}
