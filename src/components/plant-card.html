@@ -1,0 +1,128 @@
+import { Plant } from '../types';
+import { formatCurrency, addToCart } from '../utils';
+
+/**
+ * Renders an individual plant card component.
+ * This component displays the plant image, details (price, sunlight, water),
+ * and provides an "Add to Cart" button with visual feedback.
+ * 
+ * @param plant - The plant object to display
+ * @returns HTMLElement representing the plant card
+ */
+export function renderPlantCard(plant: Plant): HTMLElement {
+  const article = document.createElement('article');
+  article.className = 'card group flex flex-col h-full animate-fade-in';
+  article.setAttribute('data-plant-id', plant.id);
+
+  // Helper to get sunlight icon
+  const getSunlightIcon = (level: string) => {
+    switch (level) {
+      case 'Direct': return '☀️';
+      case 'Bright Indirect': return '🌤️';
+      case 'Medium': return '⛅';
+      case 'Low': return '☁️';
+      default: return '☀️';
+    }
+  };
+
+  // Helper to get water icon
+  const getWaterIcon = (level: string) => {
+    switch (level) {
+      case 'High': return '💧💧💧';
+      case 'Medium': return '💧💧';
+      case 'Low': return '💧';
+      default: return '💧';
+    }
+  };
+
+  article.innerHTML = `
+    <div class="relative aspect-[4/5] overflow-hidden bg-stone-100">
+      <img 
+        src="${plant.imageUrl}" 
+        alt="${plant.name}" 
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        loading="lazy"
+      />
+      ${plant.isFeatured ? `
+        <div class="absolute top-3 left-3 bg-[var(--color-secondary)] text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-sm">
+          Featured
+        </div>
+      ` : ''}
+    </div>
+
+    <div class="p-5 flex flex-col flex-grow">
+      <div class="flex justify-between items-start mb-2">
+        <h3 class="text-lg font-bold text-[var(--color-text)] font-heading leading-tight">
+          ${plant.name}
+        </h3>
+        <span class="text-lg font-semibold text-[var(--color-primary)]">
+          ${formatCurrency(plant.price)}
+        </span>
+      </div>
+
+      <p class="text-sm text-[var(--color-text-muted)] line-clamp-2 mb-4 flex-grow">
+        ${plant.description}
+      </p>
+
+      <div class="flex items-center gap-4 mb-6 text-[11px] uppercase tracking-widest font-semibold text-[var(--color-text-muted)]">
+        <div class="flex items-center gap-1" title="Sunlight: ${plant.sunlight}">
+          <span>${getSunlightIcon(plant.sunlight)}</span>
+          <span>${plant.sunlight}</span>
+        </div>
+        <div class="flex items-center gap-1" title="Water: ${plant.water}">
+          <span class="text-[var(--color-accent)]">${getWaterIcon(plant.water)}</span>
+          <span>${plant.water}</span>
+        </div>
+      </div>
+
+      <button 
+        type="button"
+        class="add-to-cart-btn btn btn-primary w-full flex items-center justify-center gap-2 py-3"
+        aria-label="Add ${plant.name} to cart"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="btn-label">Add to Cart</span>
+      </button>
+    </div>
+  `;
+
+  // Event Listener for Add to Cart
+  const cartBtn = article.querySelector('.add-to-cart-btn') as HTMLButtonElement;
+  const btnLabel = article.querySelector('.btn-label') as HTMLElement;
+
+  if (cartBtn && btnLabel) {
+    cartBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Update global state
+      addToCart(plant);
+
+      // Visual Feedback
+      const originalContent = cartBtn.innerHTML;
+      const originalBg = cartBtn.style.backgroundColor;
+      
+      cartBtn.disabled = true;
+      cartBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Added!</span>
+      `;
+      cartBtn.classList.remove('btn-primary');
+      cartBtn.classList.add('bg-green-600', 'text-white');
+
+      // Revert after delay
+      setTimeout(() => {
+        cartBtn.disabled = false;
+        cartBtn.innerHTML = originalContent;
+        cartBtn.classList.add('btn-primary');
+        cartBtn.classList.remove('bg-green-600', 'text-white');
+        cartBtn.style.backgroundColor = originalBg;
+      }, 1500);
+    });
+  }
+
+  return article;
+}
