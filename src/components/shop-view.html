@@ -1,0 +1,106 @@
+import { generatePlantCatalog } from '../utils';
+import { renderPlantCard } from './plant-card';
+
+/**
+ * Renders the Shop page view into the provided container.
+ * This view generates a catalog of randomized plants and displays them in a responsive grid.
+ * 
+ * @param container - The DOM element where the shop view will be rendered.
+ */
+export function renderShopView(container: HTMLElement): void {
+  // 1. Clear container and set up the base layout
+  container.innerHTML = `
+    <div class="animate-fade-in">
+      <!-- Shop Header -->
+      <header class="bg-[var(--color-bg-card)] border-b border-[var(--color-border)] py-12 mb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 class="text-4xl md:text-5xl font-bold text-[var(--color-text)] font-heading mb-4">
+            Our Plant Collection
+          </h1>
+          <p class="text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto text-balance">
+            Explore our diverse range of lush greenery. From low-maintenance succulents to exotic tropicals, 
+            find the perfect companion for your living space.
+          </p>
+        </div>
+      </header>
+
+      <!-- Shop Controls (Filters/Sort Placeholder) -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-[var(--color-border)] shadow-sm">
+          <div class="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
+            <span class="font-medium text-[var(--color-text)]">Showing:</span>
+            <span id="plant-count">12 plants</span>
+          </div>
+          
+          <div class="flex items-center gap-4">
+            <div class="relative">
+              <select class="appearance-none bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition-all cursor-pointer">
+                <option>Sort by: Featured</option>
+                <option>Price: Low to High</option>
+                <option>Price: High to Low</option>
+                <option>Newest Arrivals</option>
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plant Grid -->
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <div id="shop-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <!-- Plant cards will be injected here -->
+        </div>
+
+        <!-- Pagination / Load More Placeholder -->
+        <div class="mt-16 flex justify-center">
+          <button class="btn btn-outline px-10 py-3 font-semibold">
+            Load More Plants
+          </button>
+        </div>
+      </main>
+
+      <!-- Newsletter / CTA Section -->
+      <section class="bg-[var(--color-primary)] text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 class="text-3xl font-bold font-heading mb-4">Join the Green Thumb Club</h2>
+          <p class="text-emerald-100 mb-8 max-w-md mx-auto">Get 10% off your first order and expert plant care tips delivered to your inbox.</p>
+          <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onsubmit="event.preventDefault(); alert('Thanks for subscribing!');">
+            <input 
+              type="email" 
+              placeholder="your@email.com" 
+              required
+              class="flex-grow px-4 py-3 rounded-lg text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            />
+            <button type="submit" class="bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-hover)] text-white font-bold py-3 px-6 rounded-lg transition-colors">
+              Subscribe
+            </button>
+          </form>
+        </div>
+      </section>
+    </div>
+  `;
+
+  // 2. Generate the catalog and inject cards
+  const grid = container.querySelector('#shop-grid');
+  const countDisplay = container.querySelector('#plant-count');
+  
+  if (grid) {
+    // Generate 12 random plants for the shop
+    const catalog = generatePlantCatalog(12);
+    
+    if (countDisplay) {
+      countDisplay.textContent = `${catalog.length} plants`;
+    }
+
+    // Render each plant card and append to the grid
+    catalog.forEach(plant => {
+      const card = renderPlantCard(plant);
+      grid.appendChild(card);
+    });
+  }
+}
