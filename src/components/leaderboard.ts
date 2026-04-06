@@ -1,185 +1,186 @@
-import { getLeaderboard } from '../appwrite';
+import { Query } from 'appwrite';
+import { databases, DATABASE_ID, COLLECTION_PROFILES } from '../appwrite';
 import { formatNumber } from '../utils';
-import { LeaderboardEntry } from '../types';
+import { PlayerProfile } from '../types';
 
 /**
- * Escapes HTML characters to prevent XSS attacks when displaying user input
- * fetched from the database.
- */
-function escapeHTML(str: string): string {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-/**
- * Renders the global leaderboard panel, fetching the top players from Appwrite.
- * Handles loading, error, and empty states gracefully.
+ * Renders the global leaderboard, fetching the top players from Appwrite.
  * 
- * @param container The DOM element to mount the leaderboard into.
+ * @param container The DOM element to append the leaderboard to.
  */
-export async function renderLeaderboard(container: HTMLElement): Promise<void> {
-  // 1. Render Loading State
-  container.innerHTML = `
-    <div class="flex flex-col h-full bg-[var(--color-surface)] border-l border-white/5 shadow-2xl">
-      <div class="sticky top-0 bg-[var(--color-surface)]/95 backdrop-blur-sm z-10 p-4 sm:p-6 border-b border-white/10 shadow-md">
-        <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
-          <span>🏆</span> Global Leaderboard
-        </h2>
-        <p class="text-xs sm:text-sm text-gray-400 mt-1">Connecting to Appwrite...</p>
-      </div>
-      <div class="flex-1 flex items-center justify-center pb-24">
-        <div class="flex flex-col items-center gap-4">
-          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--color-accent)]"></div>
-          <span class="text-gray-400 text-sm font-medium animate-pulse">Fetching top bakers...</span>
-        </div>
-      </div>
-    </div>
+export function renderLeaderboard(container: HTMLElement): void {
+  // Main wrapper for the leaderboard area
+  const wrapper = document.createElement('div');
+  wrapper.className = 'flex flex-col h-full w-full bg-[#FFF8E1] overflow-hidden relative animate-fade-in';
+
+  // ==========================================
+  // HEADER
+  // ==========================================
+  const header = document.createElement('div');
+  header.className = 'p-6 border-b border-[#D7CCC8] bg-white shrink-0 z-10 shadow-sm flex justify-between items-center';
+  
+  const titleContainer = document.createElement('div');
+  titleContainer.innerHTML = `
+    <h2 class="text-2xl font-extrabold text-[#5D4037] tracking-tight flex items-center gap-2">
+      <span>🏆</span> Global Leaderboard
+    </h2>
+    <p class="text-sm text-[#8D6E63] mt-1 font-medium">Top 50 Bakers Worldwide</p>
   `;
 
-  try {
-    // 2. Fetch Data from Appwrite
-    // We request the top 50 players. The getLeaderboard function handles the Appwrite Query.
-    const entries = await getLeaderboard(50) as LeaderboardEntry[];
+  const refreshBtn = document.createElement('button');
+  refreshBtn.className = 'p-2 rounded-full hover:bg-[#FFF8E1] text-[#8D6E63] hover:text-[#FF9800] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FFC107]';
+  refreshBtn.innerHTML = '🔄';
+  refreshBtn.title = 'Refresh Leaderboard';
 
-    // 3. Render Empty State (if no data)
-    if (!entries || entries.length === 0) {
-      container.innerHTML = `
-        <div class="flex flex-col h-full bg-[var(--color-surface)] border-l border-white/5 shadow-2xl">
-          <div class="sticky top-0 bg-[var(--color-surface)]/95 backdrop-blur-sm z-10 p-4 sm:p-6 border-b border-white/10 shadow-md flex justify-between items-center">
-            <div>
-              <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
-                <span>🏆</span> Global Leaderboard
-              </h2>
-              <p class="text-xs sm:text-sm text-gray-400 mt-1">Top bakers worldwide</p>
-            </div>
-            <button id="refresh-leaderboard" class="p-2 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white" title="Refresh">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-              </svg>
-            </button>
-          </div>
-          <div class="flex-1 flex flex-col items-center justify-center pb-24 text-center px-6">
-            <div class="text-6xl mb-4 opacity-50 grayscale">🍪</div>
-            <h3 class="text-lg font-bold text-white mb-2">No Bakers Yet!</h3>
-            <p class="text-gray-400 text-sm">Be the first to bake some cookies and claim the #1 spot!</p>
-          </div>
-        </div>
-      `;
-      attachRefreshListener(container);
-      return;
-    }
+  header.appendChild(titleContainer);
+  header.appendChild(refreshBtn);
+  wrapper.appendChild(header);
 
-    // 4. Render Populated List
-    const listHtml = entries.map((entry, index) => {
-      const rank = index + 1;
-      let medal = '';
-      let rowClass = 'bg-black/20 border-white/5 hover:bg-black/40';
-      let rankClass = 'text-gray-500';
+  // ==========================================
+  // CONTENT AREA
+  // ==========================================
+  const content = document.createElement('div');
+  content.className = 'flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar relative';
+  wrapper.appendChild(content);
 
-      // Special styling for top 3
-      if (rank === 1) {
-        medal = '🥇';
-        rowClass = 'bg-[var(--color-accent)]/10 border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/20';
-      } else if (rank === 2) {
-        medal = '🥈';
-        rowClass = 'bg-gray-300/10 border-gray-300/30 hover:bg-gray-300/20';
-      } else if (rank === 3) {
-        medal = '🥉';
-        rowClass = 'bg-[var(--color-secondary)]/10 border-[var(--color-secondary)]/30 hover:bg-[var(--color-secondary)]/20';
-      } else {
-        medal = `<span class="font-mono text-sm">#${rank}</span>`;
-      }
-
-      const safeUsername = escapeHTML(entry.username || 'Anonymous Baker');
-
-      return `
-        <div class="flex items-center justify-between p-3 sm:p-4 rounded-xl border transition-all duration-200 ${rowClass}">
-          <div class="flex items-center gap-3 sm:gap-4 overflow-hidden">
-            <div class="text-xl sm:text-2xl w-8 sm:w-10 text-center flex-shrink-0 flex items-center justify-center ${rankClass}">
-              ${medal}
-            </div>
-            <div class="flex flex-col min-w-0">
-              <div class="font-bold text-white truncate text-sm sm:text-base" title="${safeUsername}">
-                ${safeUsername}
-              </div>
-              <div class="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">
-                Rank ${rank}
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-col items-end flex-shrink-0 pl-2">
-            <div class="text-[var(--color-accent)] font-mono font-bold text-base sm:text-lg">
-              ${formatNumber(entry.totalCookies)}
-            </div>
-            <div class="text-[10px] sm:text-xs text-gray-400 flex items-center gap-1">
-              <span class="opacity-70">🍪</span> Baked
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    container.innerHTML = `
-      <div class="flex flex-col h-full bg-[var(--color-surface)] border-l border-white/5 shadow-2xl">
-        <div class="sticky top-0 bg-[var(--color-surface)]/95 backdrop-blur-sm z-10 p-4 sm:p-6 border-b border-white/10 shadow-md flex justify-between items-center">
-          <div>
-            <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
-              <span>🏆</span> Global Leaderboard
-            </h2>
-            <p class="text-xs sm:text-sm text-gray-400 mt-1">Top bakers worldwide</p>
-          </div>
-          <button id="refresh-leaderboard" class="p-2 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white group" title="Refresh Leaderboard">
-            <svg class="w-5 h-5 group-active:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-          </button>
-        </div>
-        <div class="flex-1 overflow-y-auto p-4 space-y-2 pb-24">
-          ${listHtml}
-        </div>
+  // ==========================================
+  // DATA FETCHING & RENDERING
+  // ==========================================
+  
+  const loadLeaderboard = async () => {
+    // Show loading state
+    content.innerHTML = `
+      <div class="flex flex-col items-center justify-center h-full text-[#8D6E63] space-y-4">
+        <div class="text-5xl animate-spin-slow origin-center inline-block">🍪</div>
+        <div class="font-bold text-lg animate-pulse">Fetching high scores...</div>
       </div>
     `;
 
-    attachRefreshListener(container);
+    try {
+      // Fetch top 50 players ordered by cookies descending
+      const response = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTION_PROFILES,
+        [
+          Query.orderDesc('cookies'),
+          Query.limit(50)
+        ]
+      );
 
-  } catch (error) {
-    // 5. Render Error State
-    console.error('Failed to fetch leaderboard:', error);
-    container.innerHTML = `
-      <div class="flex flex-col h-full bg-[var(--color-surface)] border-l border-white/5 shadow-2xl">
-        <div class="sticky top-0 bg-[var(--color-surface)]/95 backdrop-blur-sm z-10 p-4 sm:p-6 border-b border-white/10 shadow-md">
-          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
-            <span>🏆</span> Global Leaderboard
-          </h2>
-        </div>
-        <div class="flex-1 flex flex-col items-center justify-center pb-24 text-center px-6">
-          <div class="text-5xl mb-4">🔌</div>
-          <h3 class="text-lg font-bold text-red-400 mb-2">Connection Error</h3>
-          <p class="text-gray-400 text-sm mb-6 max-w-xs">Could not connect to the Appwrite database to fetch scores. Please check your connection or try again later.</p>
-          <button id="retry-leaderboard" class="btn-secondary text-sm flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
+      // Clear loading state
+      content.innerHTML = '';
+
+      if (response.documents.length === 0) {
+        content.innerHTML = `
+          <div class="flex flex-col items-center justify-center h-full text-[#8D6E63] space-y-2">
+            <div class="text-4xl">📭</div>
+            <div class="font-bold text-lg">No scores yet.</div>
+            <div class="text-sm">Start baking to be the first!</div>
+          </div>
+        `;
+        return;
+      }
+
+      const list = document.createElement('div');
+      list.className = 'space-y-3 max-w-3xl mx-auto pb-8';
+
+      response.documents.forEach((doc, index) => {
+        // Cast document to our PlayerProfile type (assuming it contains username, cookies, cps)
+        const profile = doc as unknown as PlayerProfile & { username?: string, cookies?: number, cps?: number };
+        const rank = index + 1;
+
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-[#D7CCC8] hover:border-[#FFC107] hover:shadow-md transition-all duration-200 group';
+
+        // Left Side: Rank & Name
+        const leftSide = document.createElement('div');
+        leftSide.className = 'flex items-center gap-4';
+
+        const rankBadge = document.createElement('div');
+        
+        // Style top 3 ranks specially
+        let badgeClass = 'bg-[#FFF8E1] text-[#8D6E63] border border-[#D7CCC8]';
+        if (rank === 1) badgeClass = 'bg-gradient-to-br from-[#FFD700] to-[#FFA500] text-white shadow-md border-none scale-110';
+        else if (rank === 2) badgeClass = 'bg-gradient-to-br from-[#E0E0E0] to-[#9E9E9E] text-white shadow-sm border-none';
+        else if (rank === 3) badgeClass = 'bg-gradient-to-br from-[#CD7F32] to-[#A0522D] text-white shadow-sm border-none';
+
+        rankBadge.className = `w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-lg shrink-0 ${badgeClass}`;
+        rankBadge.textContent = `#${rank}`;
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'font-bold text-[#3E2723] text-lg truncate max-w-[140px] sm:max-w-[250px] group-hover:text-[#FF9800] transition-colors';
+        nameEl.textContent = profile.username || 'Anonymous Baker';
+
+        leftSide.appendChild(rankBadge);
+        leftSide.appendChild(nameEl);
+
+        // Right Side: Score & CPS
+        const rightSide = document.createElement('div');
+        rightSide.className = 'text-right flex flex-col items-end';
+
+        const scoreContainer = document.createElement('div');
+        scoreContainer.className = 'flex items-center gap-1.5';
+        
+        const scoreEl = document.createElement('div');
+        scoreEl.className = 'font-extrabold text-[#FF9800] text-lg md:text-xl tracking-tight';
+        scoreEl.textContent = formatNumber(profile.cookies || 0);
+        
+        const cookieIcon = document.createElement('span');
+        cookieIcon.textContent = '🍪';
+        cookieIcon.className = 'text-sm md:text-base';
+
+        scoreContainer.appendChild(scoreEl);
+        scoreContainer.appendChild(cookieIcon);
+
+        const cpsEl = document.createElement('div');
+        cpsEl.className = 'text-xs text-[#8D6E63] font-semibold mt-0.5 bg-[#FFF8E1] px-2 py-0.5 rounded-md';
+        cpsEl.textContent = `${formatNumber(profile.cps || 0)} CPS`;
+
+        rightSide.appendChild(scoreContainer);
+        rightSide.appendChild(cpsEl);
+
+        item.appendChild(leftSide);
+        item.appendChild(rightSide);
+
+        list.appendChild(item);
+      });
+
+      content.appendChild(list);
+
+    } catch (error) {
+      console.error('Failed to fetch leaderboard:', error);
+      content.innerHTML = `
+        <div class="flex flex-col items-center justify-center h-full text-[#5D4037] space-y-4 text-center px-4">
+          <div class="text-5xl drop-shadow-sm">⚠️</div>
+          <div class="font-bold text-xl text-[#3E2723]">Connection Error</div>
+          <div class="text-sm text-[#8D6E63] max-w-xs">
+            Failed to load the leaderboard. Please check your internet connection or try again later.
+          </div>
+          <button id="retry-btn" class="mt-4 px-6 py-2 bg-[#FFC107] hover:bg-[#FF9800] text-[#3E2723] font-bold rounded-full shadow-sm transition-colors">
             Try Again
           </button>
         </div>
-      </div>
-    `;
-    
-    container.querySelector('#retry-leaderboard')?.addEventListener('click', () => {
-      renderLeaderboard(container);
-    });
-  }
-}
+      `;
 
-/**
- * Helper to attach the refresh button event listener.
- */
-function attachRefreshListener(container: HTMLElement): void {
-  const refreshBtn = container.querySelector('#refresh-leaderboard');
-  refreshBtn?.addEventListener('click', () => {
-    // Re-render the component to trigger a new fetch
-    renderLeaderboard(container);
+      // Attach retry listener
+      const retryBtn = content.querySelector('#retry-btn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', loadLeaderboard);
+      }
+    }
+  };
+
+  // Bind refresh button
+  refreshBtn.addEventListener('click', () => {
+    // Add a quick spin animation to the button
+    refreshBtn.classList.add('animate-spin');
+    setTimeout(() => refreshBtn.classList.remove('animate-spin'), 500);
+    loadLeaderboard();
   });
+
+  // Initial load
+  loadLeaderboard();
+
+  // Append to container
+  container.appendChild(wrapper);
 }

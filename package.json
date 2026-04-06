@@ -1,17 +1,20 @@
 {
-  "name": "cookie-clicker-appwrite",
+  "name": "cookie-clicker-clone",
+  "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "appwrite": "^16.0.0"
+    "appwrite": "^16.0.0",
+    "canvas-confetti": "^1.9.2"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.6.4",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",

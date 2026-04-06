@@ -1,23 +1,62 @@
-# 🍪 Cookie Clicker - Global Bakery
+# 🍪 Cookie Clicker Clone
 
-A modern, high-performance idle clicker game built with Vite, Vanilla TypeScript, and Tailwind CSS. Features a global leaderboard powered by Appwrite, offline progress calculation, and a responsive glassmorphism UI.
+A high-performance, browser-based incremental game built with Vite, Vanilla TypeScript, Tailwind CSS, and Appwrite. 
 
-## ✨ Features
-
-- **Classic Idle Mechanics:** Click the giant cookie to bake, buy upgrades to increase your Cookies Per Second (CPS) and Cookies Per Click (CPC).
-- **Offline Progress:** The game calculates how many cookies you baked while you were away (capped at 7 days).
-- **Global Leaderboard:** Compete with players worldwide. Your total cookies baked are synced to the cloud.
-- **Responsive Design:** Fully playable on desktop and mobile devices with touch-optimized interactions.
-- **Modern UI:** Built with Tailwind CSS featuring glassmorphism panels, smooth animations, and floating damage numbers.
+Players can click the giant cookie to earn points, purchase upgrades to increase their Cookies Per Second (CPS), and compete on a global leaderboard. The game features real-time saving and anonymous authentication powered by Appwrite.
 
 ## 🚀 Tech Stack
 
-- **Frontend:** Vite, TypeScript, HTML5, CSS3
-- **Styling:** Tailwind CSS
-- **Backend/BaaS:** Appwrite (Database & Cloud Sync)
-- **Deployment:** Cloudflare Pages (Recommended)
+*   **Frontend Framework:** Vite + Vanilla TypeScript
+*   **Styling:** Tailwind CSS
+*   **Backend/BaaS:** Appwrite (Authentication, Databases)
+*   **Deployment:** Cloudflare Pages
 
-## 🛠️ Local Development
+## 🛠️ Prerequisites
+
+*   Node.js (v18+ recommended)
+*   An [Appwrite](https://appwrite.io/) account and project.
+
+## ⚙️ Appwrite Database Setup (CRITICAL)
+
+For the game to save progress and display the leaderboard, you **must** configure your Appwrite database collections to match the data structures expected by the application.
+
+### 1. Create the Database
+1. Go to your Appwrite Console.
+2. Navigate to **Databases** and click **Create database**.
+3. Name it `Cookie Clicker` (or similar).
+4. Note the **Database ID**. Open `src/appwrite.ts` and ensure the `DATABASE_ID` constant matches this ID.
+
+### 2. Create the Profiles Collection
+1. Inside your new database, click **Create collection**.
+2. Name it `Profiles`.
+3. Note the **Collection ID**. Open `src/appwrite.ts` and ensure the `COLLECTION_PROFILES` constant matches this ID.
+
+### 3. Add Attributes to the Profiles Collection
+Navigate to the **Attributes** tab of your `Profiles` collection and create the following attributes exactly as named:
+
+| Attribute Key | Type | Size / Format | Required | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `userId` | String | 255 | Yes | The Appwrite Auth User ID |
+| `username` | String | 255 | Yes | Player's display name |
+| `gameState` | String | 65535 | Yes | JSON stringified save data |
+| `totalCookies` | Double (Float) | - | Yes | Lifetime cookies (for leaderboard) |
+| `cps` | Double (Float) | - | Yes | Current Cookies Per Second |
+
+### 4. Create Indexes (For the Leaderboard)
+Navigate to the **Indexes** tab of your `Profiles` collection and create the following index so the leaderboard can sort players by their score:
+
+*   **Index Key:** `leaderboard_rank`
+*   **Index Type:** `key`
+*   **Attributes:** `totalCookies`
+*   **Order:** `DESC`
+
+### 5. Configure Permissions
+Navigate to the **Settings** tab of your `Profiles` collection. Under **Permissions**:
+1. Click **Add Role** and select **Any** (or **Users** since the app creates anonymous sessions).
+2. Grant **Create**, **Read**, **Update**, and **Delete** permissions.
+3. Click **Update** to save.
+
+## 💻 Local Development
 
 1. **Install dependencies:**
    ```bash
@@ -39,63 +78,23 @@ A modern, high-performance idle clicker game built with Vite, Vanilla TypeScript
    npm run preview
    ```
 
-## ☁️ Appwrite Database Setup (Required for Leaderboard)
-
-This project uses Appwrite to store and retrieve the global leaderboard. To make the leaderboard work, you need to set up the database and collection in your Appwrite Console.
-
-### 1. Project Details
-The app is already configured to connect to your Appwrite instance in `src/appwrite.ts`:
-- **Endpoint:** `https://fra.cloud.appwrite.io/v1`
-- **Project ID:** `69c2b4a10015a5c19a9f`
-
-### 2. Create the Database
-1. Go to your Appwrite Console -> **Databases**.
-2. Click **Create database**.
-3. Name it `Cookie Clicker` (or similar).
-4. **IMPORTANT:** Check `src/appwrite.ts` for the exact `DATABASE_ID` exported constant and use that as the Database ID (e.g., `main` or `cookie_clicker`).
-
-### 3. Create the Collection
-1. Inside your new Database, click **Create collection**.
-2. Name it `Leaderboard`.
-3. **IMPORTANT:** Check `src/appwrite.ts` for the exact `COLLECTION_LEADERBOARD` exported constant and use that as the Collection ID (e.g., `leaderboard`).
-
-### 4. Add Attributes
-Go to the **Attributes** tab of your new collection and create the following attributes:
-
-| Attribute Key  | Type    | Size | Required | Array |
-| :---           | :---    | :--- | :---     | :---  |
-| `username`     | String  | 255  | Yes      | No    |
-| `totalCookies` | Integer | -    | Yes      | No    |
-
-*(Note: If players can reach extremely high numbers, you may want to use `Double` or `Float` for `totalCookies` instead of Integer).*
-
-### 5. Add Indexes (For Sorting)
-Go to the **Indexes** tab to ensure the leaderboard fetches the top players efficiently:
-1. Click **Create index**.
-2. **Index Key:** `score_desc`
-3. **Index Type:** `Key`
-4. **Attributes:** `totalCookies`
-5. **Order:** `DESC`
-
-### 6. Set Permissions
-Go to the **Settings** tab of your collection to allow the game to read and write scores:
-1. Under **Permissions**, click **Add Role**.
-2. Select **Any** (or **Guests** depending on your Appwrite version).
-3. Check the boxes for: **Create**, **Read**, and **Update**.
-4. Click **Update** to save.
-
 ## 🌐 Deployment
 
 This project is optimized for deployment on **Cloudflare Pages**.
 
 1. Push your code to a GitHub/GitLab repository.
-2. Go to the Cloudflare Dashboard -> Pages -> Create a project -> Connect to Git.
-3. Select your repository.
-4. **Build Settings:**
-   - Framework preset: `Vite`
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-5. Click **Save and Deploy**.
+2. Log in to the Cloudflare Dashboard and navigate to **Pages**.
+3. Click **Create a project** > **Connect to Git**.
+4. Select your repository.
+5. Configure the build settings:
+   *   **Framework preset:** None (or Vite if available)
+   *   **Build command:** `npm run build`
+   *   **Build output directory:** `dist`
+6. Click **Save and Deploy**.
 
----
-*Happy Baking! 🍪*
+## 🎮 How to Play
+
+1. **Click the Cookie:** Earn cookies manually by clicking the giant cookie on the screen.
+2. **Buy Upgrades:** Spend your cookies in the shop on the right to buy upgrades like "Auto Clicker", "Grandma", and "Cookie Factory".
+3. **Idle Progression:** Upgrades will automatically generate cookies for you every second (CPS).
+4. **Compete:** Click the "Leaderboard" button in the header to see how you rank against other bakers globally! Your progress is automatically saved to the cloud.

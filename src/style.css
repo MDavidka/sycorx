@@ -1,138 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Color Palette - Warm, baked-goods inspired */
-  --color-primary: #78350f; /* Cookie Brown */
-  --color-secondary: #d97706; /* Golden Amber */
-  --color-accent: #f59e0b; /* Bright Gold */
-  --color-bg: #1c1917; /* Dark Stone / Chocolate */
-  --color-text: #fafaf9; /* Off-White / Cream */
-  --color-surface: #292524; /* Lighter Stone */
+  /* Design System Tokens */
+  --color-primary: #5D4037;      /* Chocolate Brown */
+  --color-secondary: #FFC107;    /* Golden Dough */
+  --color-bg: #FFF8E1;           /* Soft Cream */
+  --color-accent: #FF9800;       /* Caramel */
+  --color-text: #3E2723;         /* Dark Cocoa */
+  --color-text-light: #8D6E63;   /* Lighter Cocoa for secondary text */
   
-  /* Typography */
-  --font-heading: 'Inter', system-ui, sans-serif;
+  --color-panel-bg: #ffffff;
+  --color-panel-border: #D7CCC8;
+  --color-shop-hover: #F5F5F5;
+  --color-shop-disabled: #E0E0E0;
+
+  --font-heading: 'Nunito', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 @layer base {
-  body {
-    @apply bg-[var(--color-bg)] text-[var(--color-text)] font-sans antialiased selection:bg-[var(--color-accent)] selection:text-black overflow-x-hidden;
+  html, body {
+    @apply h-full w-full overflow-hidden;
+    background-color: var(--color-bg);
+    background-image: radial-gradient(circle at center, #ffffff 0%, var(--color-bg) 100%);
+    color: var(--color-text);
     font-family: var(--font-body);
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight;
-    font-family: var(--font-heading);
-  }
-
-  /* Prevent text selection on interactive game elements */
-  .no-select {
+    /* Prevent text selection during rapid clicking */
     user-select: none;
     -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 }
 
 @layer components {
-  /* Main Cookie Click Animation */
-  .cookie-btn {
-    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), filter 0.2s ease;
-    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
-    cursor: pointer;
-    touch-action: manipulation; /* Improves mobile tap responsiveness */
+  .btn-primary {
+    @apply bg-[#FF9800] hover:bg-[#F57C00] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200 active:scale-95;
+    font-family: var(--font-heading);
   }
   
-  .cookie-btn:hover {
-    transform: scale(1.02);
-    filter: drop-shadow(0 15px 25px rgba(245, 158, 11, 0.2));
+  .btn-secondary {
+    @apply bg-[#5D4037] hover:bg-[#4E342E] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200 active:scale-95;
+    font-family: var(--font-heading);
   }
 
-  .cookie-btn:active {
-    transform: scale(0.95);
-    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
+  .panel {
+    @apply bg-white rounded-xl shadow-lg border border-[#D7CCC8];
   }
+}
 
-  /* Floating Text Animation for Clicks */
-  .floating-number {
-    animation: floatUp 1s ease-out forwards;
+@layer utilities {
+  /* Floating text animation for clicks */
+  .animate-float-up {
+    animation: floatUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     pointer-events: none;
     position: absolute;
-    color: var(--color-accent);
-    font-weight: 900;
-    font-size: 1.75rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(245, 158, 11, 0.4);
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: white;
+    text-shadow: 0px 2px 4px rgba(0,0,0,0.3), 0px 0px 2px rgba(0,0,0,0.5);
     z-index: 50;
-    font-family: var(--font-mono);
   }
 
-  @keyframes floatUp {
-    0% { 
-      opacity: 1; 
-      transform: translateY(0) scale(1); 
-    }
-    100% { 
-      opacity: 0; 
-      transform: translateY(-120px) scale(1.2); 
-    }
+  /* Idle breathing animation for the main cookie */
+  .animate-breathe {
+    animation: breathe 4s infinite ease-in-out;
   }
 
-  /* Glassmorphism Cards & Panels */
-  .panel {
-    @apply bg-[var(--color-surface)] border border-white/5 rounded-2xl p-6 shadow-2xl backdrop-blur-sm;
+  /* Active click state for the cookie */
+  .cookie-active {
+    transform: scale(0.92) !important;
+    transition: transform 0.05s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: brightness(0.9);
   }
 
-  /* Store Item / Upgrade Card */
-  .upgrade-card {
-    @apply flex items-center justify-between p-4 rounded-xl bg-black/20 border border-white/5 hover:bg-black/40 hover:border-[var(--color-secondary)]/50 transition-all duration-200 cursor-pointer select-none;
+  .cookie-idle {
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), filter 0.15s ease;
+    filter: brightness(1);
   }
 
-  .upgrade-card.disabled {
-    @apply opacity-50 grayscale cursor-not-allowed hover:bg-black/20 hover:border-white/5;
+  /* Custom scrollbar for the shop and leaderboard */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
   }
-
-  /* Button Styles */
-  .btn-primary {
-    @apply bg-[var(--color-secondary)] hover:bg-[var(--color-accent)] text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-[var(--color-secondary)]/20;
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
   }
-
-  .btn-secondary {
-    @apply bg-transparent border-2 border-[var(--color-secondary)] text-[var(--color-secondary)] hover:bg-[var(--color-secondary)] hover:text-white font-bold py-2 px-4 rounded-lg transition-all duration-200;
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-panel-border);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-text-light);
   }
 }
 
-/* Custom Scrollbar for Store & Leaderboard */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-primary);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-secondary);
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  20% {
+    transform: translateY(-20px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(1);
+  }
 }
 
-/* Toast Notification Animation */
-@keyframes slideInRight {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-
-.toast-enter {
-  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-.toast-exit {
-  animation: fadeOut 0.3s ease-in forwards;
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
 }

@@ -1,66 +1,69 @@
 /**
- * Shared TypeScript interfaces and types for the Cookie Clicker game.
+ * Represents an available upgrade in the shop.
  */
-
-export interface GameState {
-  /** Current available cookies to spend */
-  cookies: number;
-  /** Total cookies ever baked (used for leaderboard scoring) */
-  totalCookiesBaked: number;
-  /** Current automated production rate (Cookies Per Second) */
-  cookiesPerSecond: number;
-  /** Current manual production rate (Cookies Per Click) */
-  cookiesPerClick: number;
-  /** Map of upgrade IDs to the quantity owned */
-  upgrades: Record<string, number>;
-  /** The player's chosen username */
-  username: string;
-  /** Timestamp of the last save (used for idle offline calculation) */
-  lastSaved: number;
-}
-
 export interface Upgrade {
-  /** Unique identifier for the upgrade */
   id: string;
-  /** Display name of the upgrade */
   name: string;
-  /** Short description of what the upgrade does */
   description: string;
-  /** Initial cost of the upgrade (scales exponentially) */
   baseCost: number;
-  /** Amount of cookies generated (either per second or per click based on type) */
-  baseProduction: number;
-  /** Whether this upgrade boosts manual clicking or passive idle generation */
-  type: 'click' | 'passive';
-  /** Emoji or image URL representing the upgrade */
-  icon: string;
+  baseCps: number; // Cookies per second added per level
+  baseClickPower: number; // Click power added per level
+  costMultiplier: number; // Multiplier for cost increase per purchase (e.g., 1.15)
+  icon: string; // Emoji or image URL representation
 }
 
+/**
+ * Represents the player's current game state.
+ * This is the core data structure that gets saved and loaded.
+ */
+export interface GameState {
+  cookies: number; // Current unspent cookies
+  totalCookies: number; // Lifetime cookies baked (used for leaderboards/achievements)
+  cps: number; // Current cookies per second
+  clickPower: number; // Current cookies earned per manual click
+  upgrades: Record<string, number>; // Map of upgrade ID to quantity owned
+  lastSaveTime: number; // Unix timestamp of the last save
+}
+
+/**
+ * Represents a player's profile as stored in the Appwrite database.
+ */
+export interface PlayerProfile {
+  $id?: string; // Appwrite document ID
+  userId: string; // Appwrite Auth User ID
+  username: string; // Display name for the leaderboard
+  gameState: string; // JSON stringified GameState for easy storage
+  totalCookies: number; // Extracted for database indexing and leaderboard sorting
+  cps: number; // Extracted for database indexing and leaderboard sorting
+}
+
+/**
+ * Represents a single entry on the global leaderboard.
+ */
 export interface LeaderboardEntry {
-  /** Appwrite Document ID */
   $id: string;
-  /** Player's username */
   username: string;
-  /** Total cookies baked by the player */
   totalCookies: number;
-  /** ISO Date string of when the score was last updated */
-  updatedAt: string;
+  cps: number;
 }
 
+/**
+ * Represents a floating text particle (e.g., "+1") spawned when clicking the cookie.
+ */
+export interface FloatingText {
+  id: string;
+  x: number;
+  y: number;
+  value: number;
+  createdAt: number;
+}
+
+/**
+ * Configuration for the site/game.
+ */
 export interface SiteConfig {
   title: string;
-  description: string;
   version: string;
-}
-
-export interface NavItem {
-  label: string;
-  href: string;
-}
-
-export interface ToastNotification {
-  id: string;
-  message: string;
-  type: 'success' | 'info' | 'warning' | 'error';
-  duration?: number;
+  saveIntervalMs: number; // How often to auto-save to the database
+  tickRateMs: number; // How often the game loop runs (e.g., 100ms for smooth updates)
 }
