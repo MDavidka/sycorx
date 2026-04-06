@@ -1,95 +1,247 @@
 import './style.css';
-import { GameState, ViewState, Building } from './types';
-import { renderLayout, getContentContainer } from './components/layout';
-import { renderStats } from './components/stats';
-import { renderCookie } from './components/cookie';
-import { renderStore } from './components/store';
-import { renderLeaderboard } from './components/leaderboard';
-import { submitScore } from './db';
+import { GameState, ViewState } from './types';
+import { loadGame, saveGame, generateGuestName, createElement } from './utils';
+import { initHeader, HeaderComponent } from './components/header';
+import { initCookieArea, CookieAreaComponent } from './components/cookieArea';
+import { initShop, ShopComponent, UPGRADES, calculateCost } from './components/shop';
+import { initLeaderboard, LeaderboardComponent } from './components/leaderboard';
+import { initSettings, SettingsComponent } from './components/settings';
 
-// Initial Game State
-let state: GameState = {
-  cookies: 0,
-  totalCookiesEarned: 0,
-  cookiesPerSecond: 0,
-  lastUpdated: Date.now(),
-  buildings: [
-    { id: 'cursor', name: 'Cursor', baseCost: 15, baseProduction: 0.1, count: 0, description: 'Clicks the cookie for you.' },
-    { id: 'grandma', name: 'Grandma', baseCost: 100, baseProduction: 1, count: 0, description: 'Bakes cookies with love.' },
-    { id: 'factory', name: 'Factory', baseCost: 1100, baseProduction: 8, count: 0, description: 'Produces cookies in bulk.' }
-  ]
-};
+// --- Configuration ---
+const TICK_RATE_MS = 100; // 10 ticks per second for smooth updates
+const SAVE_INTERVAL_MS = 10000; // Auto-save every 10 seconds
 
+// --- Global State ---
+let state: GameState;
 let currentView: ViewState = 'game';
 
-function updateCPS() {
-  state.cookiesPerSecond = state.buildings.reduce((acc, b) => acc + (b.count * b.baseProduction), 0);
+// Component references for updating UI
+let headerComponent: HeaderComponent;
+let cookieAreaComponent: CookieAreaComponent;
+let shopComponent: ShopComponent;
+let leaderboardComponent: LeaderboardComponent;
+let settingsComponent: SettingsComponent;
+
+/**
+ * Generates a fresh default game state.
+ */
+function getDefaultState(): GameState {
+    return {
+        playerName: generateGuestName(),
+        cookies: 0,
+        totalCookies: 0,
+        cookiesPerSecond: 0,
+        inventory: {},
+        lastSaveTime: Date.now()
+    };
 }
 
-function handleCookieClick() {
-  state.cookies += 1;
-  state.totalCookiesEarned += 1;
-  render();
+/**
+ * Recalculates the total Cookies Per Second (CPS) based on the current inventory.
+ */
+function recalculateCPS() {
+    let totalCps = 0;
+    for (const upgrade of UPGRADES) {
+        const owned = state.inventory[upgrade.id] || 0;
+        totalCps += owned * upgrade.baseCps;
+    }
+    state.cookiesPerSecond = totalCps;
 }
 
-function handlePurchase(buildingId: string) {
-  const building = state.buildings.find(b => b.id === buildingId);
-  if (!building) return;
+/**
+ * Calculates and applies cookies earned while the player was away.
+ */
+function processOfflineProgress() {
+    const now = Date.now();
+    if (state.lastSaveTime && state.cookiesPerSecond > 0) {
+        const secondsOffline = (now - state.lastSaveTime) / 1000;
+        // Cap offline progress to 7 days to prevent overflow/exploits
+        const maxOfflineSeconds = 7 * 24 * 60 * 60;
+        const effectiveSeconds = Math.min(secondsOffline, maxOfflineSeconds);
 
-  const cost = Math.floor(building.baseCost * Math.pow(1.15, building.count));
-  if (state.cookies >= cost) {
-    state.cookies -= cost;
-    building.count += 1;
-    updateCPS();
-    render();
-  }
+        if (effectiveSeconds > 0) {
+            const earned = effectiveSeconds * state.cookiesPerSecond;
+            state.cookies += earned;
+            state.totalCookies += earned;
+            console.log(`Welcome back! You earned ${Math.floor(earned)} cookies while offline.`);
+        }
+    }
+    state.lastSaveTime = now;
 }
 
-async function handleScoreSubmit(username: string) {
-  await submitScore(username, Math.floor(state.totalCookiesEarned));
+/**
+ * Pushes the current state to all UI components.
+ */
+function updateAllUI() {
+    headerComponent?.updateState(state);
+    cookieAreaComponent?.updateState(state);
+    shopComponent?.updateState(state);
+    leaderboardComponent?.updateState(state);
+    settingsComponent?.updateState(state);
 }
 
-function render() {
-  const app = document.getElementById('app')!;
-  
-  // Ensure layout is rendered
-  if (!app.querySelector('header')) {
-    renderLayout(app, currentView, (view) => {
-      currentView = view;
-      render();
+/**
+ * Handles switching between different main views (Game, Leaderboard, Settings).
+ */
+function switchView(newView: ViewState, containers: Record<ViewState, HTMLElement>) {
+    currentView = newView;
+    
+    // Update Header UI
+    headerComponent.updateView(currentView);
+
+    // Toggle container visibility
+    Object.entries(containers).forEach(([viewId, el]) => {
+        if (viewId === currentView) {
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+            
+            // Refresh leaderboard data when switching to it
+            if (viewId === 'leaderboard') {
+                leaderboardComponent.refresh();
+            }
+        } else {
+            el.classList.remove('flex');
+            el.classList.add('hidden');
+        }
     });
-  }
-
-  const content = getContentContainer(app);
-  
-  if (currentView === 'game') {
-    content.innerHTML = `
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div id="left-col" class="flex flex-col gap-6"></div>
-        <div id="right-col" class="flex flex-col gap-6"></div>
-      </div>
-    `;
-    renderStats(content.querySelector('#left-col')!, state);
-    renderCookie(content.querySelector('#left-col')!, handleCookieClick);
-    renderStore(content.querySelector('#right-col')!, state, handlePurchase);
-  } else if (currentView === 'leaderboard') {
-    renderLeaderboard(content, state.totalCookiesEarned, handleScoreSubmit);
-  }
 }
 
-// Game Loop
-setInterval(() => {
-  const now = Date.now();
-  const delta = (now - state.lastUpdated) / 1000;
-  state.cookies += state.cookiesPerSecond * delta;
-  state.totalCookiesEarned += state.cookiesPerSecond * delta;
-  state.lastUpdated = now;
-  
-  // Only re-render if we are in the game view to keep UI responsive
-  if (currentView === 'game') {
-    render();
-  }
-}, 1000);
+/**
+ * Initializes the entire application.
+ */
+export function initApp() {
+    const root = document.getElementById('app');
+    if (!root) {
+        console.error('Root element #app not found!');
+        return;
+    }
 
-// Initial Mount
-render();
+    // 1. Load State & Process Offline Progress
+    const savedState = loadGame();
+    state = savedState ? { ...getDefaultState(), ...savedState } : getDefaultState();
+    
+    recalculateCPS();
+    processOfflineProgress();
+
+    // 2. Setup Main DOM Structure
+    root.className = 'h-screen w-screen flex flex-col bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden font-body';
+    
+    const headerContainer = createElement('div', { className: 'shrink-0 z-20 relative' });
+    const mainContent = createElement('main', { className: 'flex-1 relative overflow-hidden' });
+    
+    root.appendChild(headerContainer);
+    root.appendChild(mainContent);
+
+    // View Containers
+    const gameContainer = createElement('div', { 
+        className: 'h-full w-full flex flex-col md:flex-row hidden' 
+    });
+    
+    const leaderboardContainer = createElement('div', { 
+        className: 'h-full w-full hidden overflow-y-auto' 
+    });
+    
+    const settingsContainer = createElement('div', { 
+        className: 'h-full w-full hidden overflow-y-auto' 
+    });
+
+    mainContent.appendChild(gameContainer);
+    mainContent.appendChild(leaderboardContainer);
+    mainContent.appendChild(settingsContainer);
+
+    const viewContainers: Record<ViewState, HTMLElement> = {
+        'game': gameContainer,
+        'leaderboard': leaderboardContainer,
+        'settings': settingsContainer
+    };
+
+    // Game View Sub-containers
+    const cookieAreaContainer = createElement('div', { 
+        className: 'flex-1 h-[50%] md:h-full relative' 
+    });
+    const shopContainer = createElement('div', { 
+        className: 'h-[50%] md:h-full w-full md:w-80 lg:w-96 shrink-0 z-10 relative' 
+    });
+    
+    gameContainer.appendChild(cookieAreaContainer);
+    gameContainer.appendChild(shopContainer);
+
+    // 3. Initialize Components
+    
+    // Header
+    headerComponent = initHeader(headerContainer, (view) => switchView(view, viewContainers));
+
+    // Cookie Area
+    cookieAreaComponent = initCookieArea(cookieAreaContainer, () => {
+        // Manual click adds 1 cookie (could be expanded with click upgrades later)
+        state.cookies += 1;
+        state.totalCookies += 1;
+        updateAllUI();
+    });
+
+    // Shop
+    shopComponent = initShop(shopContainer, (upgradeId) => {
+        const upgrade = UPGRADES.find(u => u.id === upgradeId);
+        if (!upgrade) return;
+
+        const owned = state.inventory[upgradeId] || 0;
+        const cost = calculateCost(upgrade.baseCost, upgrade.costMultiplier, owned);
+
+        if (state.cookies >= cost) {
+            state.cookies -= cost;
+            state.inventory[upgradeId] = owned + 1;
+            recalculateCPS();
+            updateAllUI();
+        }
+    });
+
+    // Leaderboard
+    leaderboardComponent = initLeaderboard(leaderboardContainer);
+
+    // Settings
+    settingsComponent = initSettings(
+        settingsContainer,
+        (newName) => {
+            state.playerName = newName;
+            saveGame(state);
+            updateAllUI();
+        },
+        () => {
+            // Hard Reset
+            state = getDefaultState();
+            recalculateCPS();
+            saveGame(state);
+            updateAllUI();
+            switchView('game', viewContainers);
+        }
+    );
+
+    // 4. Start Game Loops
+    
+    // Main Tick Loop (CPS)
+    setInterval(() => {
+        if (state.cookiesPerSecond > 0) {
+            const cookiesToAdd = state.cookiesPerSecond * (TICK_RATE_MS / 1000);
+            state.cookies += cookiesToAdd;
+            state.totalCookies += cookiesToAdd;
+            updateAllUI();
+        }
+    }, TICK_RATE_MS);
+
+    // Auto-Save Loop
+    setInterval(() => {
+        state.lastSaveTime = Date.now();
+        saveGame(state);
+    }, SAVE_INTERVAL_MS);
+
+    // 5. Finalize Initialization
+    updateAllUI();
+    switchView('game', viewContainers);
+}
+
+// Boot the app when the DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
