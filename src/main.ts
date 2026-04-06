@@ -1,204 +1,95 @@
 import './style.css';
-import { ID, Query } from 'appwrite';
-import { account, databases, DATABASE_ID, COLLECTION_PROFILES } from './appwrite';
-import { initEngine, startEngine } from './engine';
-import { renderHeader } from './components/header';
-import { renderCookieArea } from './components/cookie-area';
-import { renderShopArea } from './components/shop-area';
+import { GameState, ViewState, Building } from './types';
+import { renderLayout, getContentContainer } from './components/layout';
+import { renderStats } from './components/stats';
+import { renderCookie } from './components/cookie';
+import { renderStore } from './components/store';
 import { renderLeaderboard } from './components/leaderboard';
-import { PlayerProfile } from './types';
+import { submitScore } from './db';
 
-/**
- * Initializes the application, handles Appwrite authentication,
- * fetches or creates the player profile, and mounts the UI.
- */
-async function initApp() {
-  const appEl = document.getElementById('app');
-  if (!appEl) {
-    console.error('Root element #app not found');
-    return;
+// Initial Game State
+let state: GameState = {
+  cookies: 0,
+  totalCookiesEarned: 0,
+  cookiesPerSecond: 0,
+  lastUpdated: Date.now(),
+  buildings: [
+    { id: 'cursor', name: 'Cursor', baseCost: 15, baseProduction: 0.1, count: 0, description: 'Clicks the cookie for you.' },
+    { id: 'grandma', name: 'Grandma', baseCost: 100, baseProduction: 1, count: 0, description: 'Bakes cookies with love.' },
+    { id: 'factory', name: 'Factory', baseCost: 1100, baseProduction: 8, count: 0, description: 'Produces cookies in bulk.' }
+  ]
+};
+
+let currentView: ViewState = 'game';
+
+function updateCPS() {
+  state.cookiesPerSecond = state.buildings.reduce((acc, b) => acc + (b.count * b.baseProduction), 0);
+}
+
+function handleCookieClick() {
+  state.cookies += 1;
+  state.totalCookiesEarned += 1;
+  render();
+}
+
+function handlePurchase(buildingId: string) {
+  const building = state.buildings.find(b => b.id === buildingId);
+  if (!building) return;
+
+  const cost = Math.floor(building.baseCost * Math.pow(1.15, building.count));
+  if (state.cookies >= cost) {
+    state.cookies -= cost;
+    building.count += 1;
+    updateCPS();
+    render();
+  }
+}
+
+async function handleScoreSubmit(username: string) {
+  await submitScore(username, Math.floor(state.totalCookiesEarned));
+}
+
+function render() {
+  const app = document.getElementById('app')!;
+  
+  // Ensure layout is rendered
+  if (!app.querySelector('header')) {
+    renderLayout(app, currentView, (view) => {
+      currentView = view;
+      render();
+    });
   }
 
-  // Show loading state
-  appEl.innerHTML = `
-    <div class="flex flex-col h-screen w-screen items-center justify-center bg-[#FFF8E1] text-[#5D4037]">
-      <div class="text-6xl animate-spin-slow origin-center mb-6">🍪</div>
-      <h1 class="text-2xl font-extrabold tracking-tight animate-pulse">Heating up the ovens...</h1>
-      <p class="text-[#8D6E63] mt-2 text-sm">Connecting to database</p>
-    </div>
-  `;
-
-  try {
-    // 1. Handle Authentication (Anonymous Session)
-    let user;
-    try {
-      user = await account.get();
-    } catch (e) {
-      // If account.get() fails, the user is not logged in. Create an anonymous session.
-      console.log('No active session found. Creating anonymous session...');
-      await account.createAnonymousSession();
-      user = await account.get();
-    }
-
-    // 2. Fetch or Create Player Profile
-    const profileDocs = await databases.listDocuments(
-      DATABASE_ID,
-      COLLECTION_PROFILES,
-      [Query.equal('userId', user.$id)]
-    );
-
-    let profile: PlayerProfile;
-
-    if (profileDocs.documents.length > 0) {
-      // Profile exists, load it
-      profile = profileDocs.documents[0] as unknown as PlayerProfile;
-      console.log('Profile loaded:', profile.username);
-    } else {
-      // No profile exists, prompt for username and create one
-      let username = prompt('Welcome to Cookie Clicker! Enter your baker name:')?.trim();
-      if (!username) {
-        username = `Baker${Math.floor(Math.random() * 10000)}`;
-      }
-
-      // Initial empty game state
-      const initialGameState = {
-        cookies: 0,
-        totalCookies: 0,
-        cps: 0,
-        clickPower: 1,
-        upgrades: {},
-        lastSaveTime: Date.now()
-      };
-
-      const newProfileData = {
-        userId: user.$id,
-        username: username,
-        gameState: JSON.stringify(initialGameState),
-        totalCookies: 0,
-        cps: 0
-      };
-
-      console.log('Creating new profile for:', username);
-      const newDoc = await databases.createDocument(
-        DATABASE_ID,
-        COLLECTION_PROFILES,
-        ID.unique(),
-        newProfileData
-      );
-      
-      profile = newDoc as unknown as PlayerProfile;
-    }
-
-    // 3. Initialize and Start the Game Engine
-    initEngine(profile);
-    startEngine();
-
-    // 4. Render the UI
-    renderUI(appEl, profile.username);
-
-  } catch (error) {
-    console.error('Initialization failed:', error);
-    appEl.innerHTML = `
-      <div class="flex flex-col h-screen w-screen items-center justify-center bg-[#FFF8E1] text-[#5D4037] p-6 text-center">
-        <div class="text-6xl mb-4 drop-shadow-sm">⚠️</div>
-        <h1 class="text-2xl font-extrabold mb-2 text-[#3E2723]">Failed to load game</h1>
-        <p class="text-[#8D6E63] max-w-md mb-6">
-          Could not connect to the database. Please ensure your Appwrite project is configured correctly and the collections exist.
-        </p>
-        <button onclick="window.location.reload()" class="btn-primary">
-          Reload Page
-        </button>
+  const content = getContentContainer(app);
+  
+  if (currentView === 'game') {
+    content.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div id="left-col" class="flex flex-col gap-6"></div>
+        <div id="right-col" class="flex flex-col gap-6"></div>
       </div>
     `;
+    renderStats(content.querySelector('#left-col')!, state);
+    renderCookie(content.querySelector('#left-col')!, handleCookieClick);
+    renderStore(content.querySelector('#right-col')!, state, handlePurchase);
+  } else if (currentView === 'leaderboard') {
+    renderLeaderboard(content, state.totalCookiesEarned, handleScoreSubmit);
   }
 }
 
-/**
- * Constructs the layout and mounts all UI components.
- * 
- * @param appEl The root application element.
- * @param username The current player's username.
- */
-function renderUI(appEl: HTMLElement, username: string) {
-  // Clear loading screen and set base layout classes
-  appEl.innerHTML = '';
-  appEl.className = 'flex flex-col h-screen w-screen overflow-hidden bg-[#FFF8E1] text-[#3E2723]';
-
-  // ==========================================
-  // LAYOUT STRUCTURE
-  // ==========================================
+// Game Loop
+setInterval(() => {
+  const now = Date.now();
+  const delta = (now - state.lastUpdated) / 1000;
+  state.cookies += state.cookiesPerSecond * delta;
+  state.totalCookiesEarned += state.cookiesPerSecond * delta;
+  state.lastUpdated = now;
   
-  // Header Container
-  const headerContainer = document.createElement('div');
-  headerContainer.className = 'shrink-0 z-30 relative shadow-sm';
-  appEl.appendChild(headerContainer);
+  // Only re-render if we are in the game view to keep UI responsive
+  if (currentView === 'game') {
+    render();
+  }
+}, 1000);
 
-  // Main Content Area (relative for absolute positioning of views)
-  const mainContent = document.createElement('main');
-  mainContent.className = 'flex-1 relative overflow-hidden flex flex-col';
-  appEl.appendChild(mainContent);
-
-  // --- View 1: Game View (Cookie + Shop) ---
-  const gameView = document.createElement('div');
-  gameView.className = 'absolute inset-0 flex flex-col md:flex-row transition-opacity duration-300 opacity-100 z-20 bg-[#FFF8E1]';
-  
-  const cookieContainer = document.createElement('div');
-  cookieContainer.className = 'flex-1 relative h-1/2 md:h-full';
-  
-  const shopContainer = document.createElement('div');
-  shopContainer.className = 'w-full md:w-80 lg:w-96 shrink-0 h-1/2 md:h-full border-t md:border-t-0 md:border-l border-[#D7CCC8] bg-white z-10 shadow-[-4px_0_15px_rgba(0,0,0,0.03)]';
-
-  gameView.appendChild(cookieContainer);
-  gameView.appendChild(shopContainer);
-
-  // --- View 2: Leaderboard View ---
-  const leaderboardView = document.createElement('div');
-  leaderboardView.className = 'absolute inset-0 transition-opacity duration-300 opacity-0 pointer-events-none z-10 bg-[#FFF8E1]';
-
-  mainContent.appendChild(gameView);
-  mainContent.appendChild(leaderboardView);
-
-  // ==========================================
-  // VIEW TOGGLE LOGIC
-  // ==========================================
-  
-  const onToggleLeaderboard = (showLeaderboard: boolean) => {
-    if (showLeaderboard) {
-      // Hide Game View
-      gameView.classList.replace('opacity-100', 'opacity-0');
-      gameView.classList.replace('z-20', 'z-10');
-      gameView.classList.add('pointer-events-none');
-      
-      // Show Leaderboard View
-      leaderboardView.classList.replace('opacity-0', 'opacity-100');
-      leaderboardView.classList.replace('z-10', 'z-20');
-      leaderboardView.classList.remove('pointer-events-none');
-    } else {
-      // Hide Leaderboard View
-      leaderboardView.classList.replace('opacity-100', 'opacity-0');
-      leaderboardView.classList.replace('z-20', 'z-10');
-      leaderboardView.classList.add('pointer-events-none');
-      
-      // Show Game View
-      gameView.classList.replace('opacity-0', 'opacity-100');
-      gameView.classList.replace('z-10', 'z-20');
-      gameView.classList.remove('pointer-events-none');
-    }
-  };
-
-  // ==========================================
-  // MOUNT COMPONENTS
-  // ==========================================
-  
-  renderHeader(headerContainer, username, onToggleLeaderboard);
-  renderCookieArea(cookieContainer);
-  renderShopArea(shopContainer);
-  renderLeaderboard(leaderboardView);
-}
-
-// Boot the application when the DOM is fully loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  initApp();
-}
+// Initial Mount
+render();
