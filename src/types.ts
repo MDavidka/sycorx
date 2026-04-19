@@ -2,10 +2,6 @@
  * Shared TypeScript interfaces and types for the Nivle Hosting platform.
  */
 
-// ==========================================
-// Site Configuration Types
-// ==========================================
-
 export interface NavItem {
   label: string;
   href: string;
@@ -17,86 +13,76 @@ export interface SiteConfig {
   navItems: NavItem[];
 }
 
-// ==========================================
-// Domain Models (Database Entities)
-// ==========================================
-
-export type PlanType = 'shared' | 'vps' | 'dedicated' | 'cloud';
+export type PlanType = 'shared' | 'vps' | 'dedicated';
+export type BillingCycle = 'monthly' | 'yearly';
 
 export interface HostingPlan {
-  _id: string;
+  _id?: string;
   name: string;
-  description: string;
-  priceMonthly: number;
-  priceYearly: number;
-  features: string[];
   type: PlanType;
+  price: number;
+  billingCycle: BillingCycle;
+  features: string[];
+  description: string;
   isPopular?: boolean;
-  specs: {
-    cpu: string;
-    ram: string;
-    storage: string;
-    bandwidth: string;
-  };
+  cpu: string;
+  ram: string;
+  storage: string;
+  bandwidth: string;
 }
 
-export type ServerState = 'operational' | 'degraded' | 'outage' | 'maintenance';
-
-export interface ServerStatus {
-  _id: string;
-  serviceName: string;
-  region: string;
-  status: ServerState;
-  uptimePercentage: number;
-  lastUpdated: string; // ISO Date string
-  incidentMessage?: string;
-}
+export type UserRole = 'admin' | 'customer';
 
 export interface User {
-  _id: string;
+  _id?: string;
   name: string;
   email: string;
-  avatarUrl?: string;
-  joinedAt: string; // ISO Date string
+  role: UserRole;
+  createdAt: string;
 }
 
-export type SubscriptionStatus = 'active' | 'pending' | 'suspended' | 'cancelled';
+export type ServiceStatus = 'active' | 'suspended' | 'pending' | 'cancelled';
 
-export interface Subscription {
-  _id: string;
+export interface ActiveService {
+  _id?: string;
   userId: string;
   planId: string;
-  domain: string;
-  status: SubscriptionStatus;
+  planName: string; // Denormalized for easier display
+  domain?: string;
   ipAddress?: string;
-  billingCycle: 'monthly' | 'yearly';
-  nextBillingDate: string; // ISO Date string
-  createdAt: string; // ISO Date string
+  status: ServiceStatus;
+  startDate: string;
+  renewalDate: string;
 }
 
-// ==========================================
-// Component Prop Types
-// ==========================================
+export type TicketStatus = 'open' | 'in-progress' | 'closed';
+export type TicketPriority = 'low' | 'medium' | 'high';
 
-export interface PlanCardProps {
-  plan: HostingPlan;
-  onSelect?: (plan: HostingPlan) => void;
-  billingCycle?: 'monthly' | 'yearly';
+export interface Ticket {
+  _id?: string;
+  userId: string;
+  subject: string;
+  message: string;
+  status: TicketStatus;
+  priority: TicketPriority;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface StatusTableProps {
-  servers: ServerStatus[];
-  isLoading?: boolean;
+export interface TicketReply {
+  _id?: string;
+  ticketId: string;
+  userId: string;
+  message: string;
+  isAdminReply: boolean;
+  createdAt: string;
 }
 
-// ==========================================
 // API Response Types
-// ==========================================
-
 export interface ApiResponse<T> {
+  success: boolean;
   data?: T;
   error?: string;
-  success: boolean;
 }
 
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {

@@ -1,47 +1,69 @@
-# Nivle - Cloud Hosting for Modern Teams ☁️
+# Nivle Hosting Platform
 
-Nivle is a modern, high-performance web hosting platform interface designed to provide users with scalable hosting solutions. It features a clean, "Cloud-Native" aesthetic, real-time server status monitoring, and a seamless checkout experience.
+Welcome to the **Nivle Hosting Platform** repository. This project is a modern, high-performance, cloud-native hosting company website built with React, Vite, TypeScript, Tailwind CSS, and Hero UI.
 
-Built with **React**, **Vite**, **TypeScript**, and **Hero UI**, this project is optimized for speed, accessibility, and easy deployment to edge networks like Cloudflare Pages.
+## 🚀 Features
 
-## ✨ Features
+- **Modern Minimalist Design:** A clean, breathable layout with a developer-first aesthetic.
+- **Dark Mode First:** Native dark mode support using Hero UI and Tailwind CSS.
+- **Responsive Layout:** Fully mobile-responsive design ensuring a seamless experience across all devices.
+- **Interactive UI Components:** Built entirely using `@heroui/react` primitives (Cards, Modals, Tables, Navbars, etc.).
+- **Client-Side Routing:** Fast, seamless navigation using `react-router-dom`.
+- **Dashboard Area:** A protected user area for managing hosting instances, viewing active services, and checking billing status.
+- **Database Ready:** Structured to integrate seamlessly with the MongoDB Atlas Data API for managing plans, users, and support tickets.
 
-- **Modern UI/UX:** Built entirely with [Hero UI](https://heroui.com/) components for a cohesive, accessible, and beautiful design system.
-- **Responsive Design:** Mobile-first approach ensuring the platform looks great on all devices.
-- **Dynamic Pricing Plans:** Toggle between monthly and yearly billing cycles with automatic price calculations and savings badges.
-- **Server Status Dashboard:** Real-time monitoring table displaying the operational status, uptime, and regions of core infrastructure services.
-- **Interactive Checkout Flow:** Integrated modal system for seamless plan selection and subscription.
-- **Dark Mode Ready:** Configured with Tailwind CSS dark mode and Hero UI's semantic color tokens.
+## 🛠️ Tech Stack
 
-## 🛠 Tech Stack
-
-- **Framework:** [React 18](https://react.dev/)
-- **Build Tool:** [Vite](https://vitejs.dev/)
+- **Framework:** [React 18](https://react.dev/) + [Vite](https://vitejs.dev/)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **UI Library:** [Hero UI](https://heroui.com/) (`@heroui/react`)
+- **UI Library:** [Hero UI](https://heroui.com/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Routing:** [React Router v6](https://reactrouter.com/)
+- **Icons:** [Lucide React](https://lucide.dev/)
 - **Animations:** [Framer Motion](https://www.framer.com/motion/)
 
-## 🚀 Getting Started
+## 📂 Project Structure
+
+```text
+nivle-hosting/
+├── index.html                # Root HTML shell
+├── package.json              # Project dependencies and scripts
+├── tsconfig.json             # TypeScript configuration
+├── vite.config.ts            # Vite bundler configuration
+├── src/
+│   ├── main.tsx              # React entry point and routing logic
+│   ├── types.ts              # Shared TypeScript interfaces
+│   ├── utils.ts              # Shared helper functions
+│   ├── style.css             # Global styles and Tailwind directives
+│   ├── db.ts                 # Database integration logic (MongoDB Data API)
+│   └── components/           # Hero UI React Components
+│       ├── header.tsx        # Global navigation bar
+│       ├── footer.tsx        # Global footer
+│       ├── home-page.tsx     # Landing page
+│       ├── pricing-page.tsx  # Hosting plans and pricing table
+│       ├── dashboard-page.tsx# User dashboard for active services
+│       └── contact-page.tsx  # Support ticket form
+```
+
+## 🚦 Getting Started
 
 ### Prerequisites
 
-- Node.js (v18 or higher recommended)
-- npm, yarn, or pnpm
+Ensure you have [Node.js](https://nodejs.org/) (v18+ recommended) installed on your machine.
 
 ### Installation
 
-1. Clone the repository (or download the source code).
+1. Clone the repository or download the source code.
 2. Navigate to the project directory:
    ```bash
    cd nivle-hosting
    ```
-3. Install dependencies:
+3. Install the dependencies:
    ```bash
    npm install
    ```
 
-### Running Locally
+### Running the Development Server
 
 Start the Vite development server:
 
@@ -51,53 +73,43 @@ npm run dev
 
 The application will be available at `http://localhost:5173`.
 
-## 📂 Project Structure
+### Building for Production
 
-```text
-project/
-├── index.html              # Main HTML entry point
-├── package.json            # Project dependencies and scripts
-├── tsconfig.json           # TypeScript configuration
-├── vite.config.ts          # Vite configuration
-└── src/
-    ├── main.tsx            # React entry point & App component
-    ├── style.css           # Global styles & Design System tokens
-    ├── types.ts            # Shared TypeScript interfaces
-    ├── utils.ts            # Helper functions (formatting, etc.)
-    ├── db.ts               # Data fetching logic & API wrappers
-    └── components/         # Reusable Hero UI components
-        ├── header.tsx      # Navigation bar
-        ├── footer.tsx      # Site footer
-        ├── plan-card.tsx   # Hosting plan display cards
-        └── status-table.tsx# Server status monitoring table
+To create a production-ready build:
+
+```bash
+npm run build
 ```
 
-## 📜 Available Scripts
+The compiled assets will be output to the `dist/` directory. You can preview the production build locally using:
 
-- `npm run dev`: Starts the development server.
-- `npm run build`: Builds the app for production into the `dist/` folder.
-- `npm run preview`: Previews the production build locally.
-- `npm run check`: Runs TypeScript type checking without emitting files.
+```bash
+npm run preview
+```
+
+## 🗄️ Database Integration
+
+This project is designed to use the **MongoDB Atlas Data API** to avoid heavy Node.js driver dependencies in edge environments like Cloudflare Pages. 
+
+Currently, the application runs in a "mocked" state if no database is connected. To connect your database:
+
+1. Open `src/db.ts`.
+2. Update the `MONGO_ENDPOINT`, `MONGO_API_KEY`, `DATA_SOURCE`, and `DATABASE_NAME` constants with your MongoDB Atlas Data API credentials.
+3. Set `export const IS_DB_CONNECTED = true;` to enable live data fetching.
 
 ## ☁️ Deployment
 
 This project is optimized for deployment on **Cloudflare Pages**.
 
-1. Push your code to a GitHub/GitLab repository.
-2. Connect the repository to Cloudflare Pages.
-3. Use the following build settings:
-   - **Framework preset:** Vite
+1. Push your code to a GitHub or GitLab repository.
+2. Log in to the Cloudflare Dashboard and navigate to **Pages**.
+3. Create a new project and connect your repository.
+4. Configure the build settings:
+   - **Framework preset:** Vite (or None)
    - **Build command:** `npm run build`
    - **Build output directory:** `dist`
-
-## 🎨 Design System
-
-The application uses a custom CSS variable system defined in `src/style.css` that integrates seamlessly with Tailwind CSS and Hero UI. 
-
-- **Primary:** Deep Indigo (`#3730a3` / `#6366f1`)
-- **Accent:** Vibrant Cyan (`#0891b2` / `#22d3ee`)
-- **Typography:** Inter (Sans-serif)
+5. Click **Save and Deploy**.
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is proprietary and created for Nivle Hosting.

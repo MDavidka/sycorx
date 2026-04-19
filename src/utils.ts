@@ -1,100 +1,91 @@
-import { ServerState } from './types';
+import { ApiResponse } from './types';
 
 /**
- * Formats a numeric amount into a localized currency string.
- * @param amount The amount to format.
- * @param currency The currency code (default: 'USD').
- * @returns Formatted currency string (e.g., "$10.00").
+ * Formats a number as a currency string.
+ * @param amount The number to format.
+ * @param currency The currency code (default: USD).
+ * @returns Formatted currency string.
  */
-export function formatCurrency(amount: number, currency: string = 'USD'): string {
+export const formatCurrency = (amount: number, currency: string = 'USD'): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    currency,
   }).format(amount);
-}
+};
 
 /**
- * Formats an ISO date string into a readable format.
- * @param dateString The ISO date string.
- * @returns Formatted date string (e.g., "Jan 1, 2024").
+ * Formats an ISO date string into a human-readable format.
+ * @param dateString The ISO date string to format.
+ * @returns Formatted date string (e.g., "Oct 24, 2023").
  */
-export function formatDate(dateString: string): string {
+export const formatDate = (dateString: string): string => {
   try {
-    const date = new Date(dateString);
-    // Check for invalid dates
-    if (isNaN(date.getTime())) {
-      return 'Invalid Date';
-    }
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
-    }).format(date);
-  } catch (error) {
-    return 'Invalid Date';
+    }).format(new Date(dateString));
+  } catch (e) {
+    return dateString;
   }
-}
+};
 
 /**
- * Formats an ISO date string into a detailed readable format including time.
- * @param dateString The ISO date string.
- * @returns Formatted date and time string (e.g., "Jan 1, 2024, 12:00 PM").
+ * Simple utility for conditionally joining CSS class names.
+ * Useful for combining Tailwind classes dynamically.
+ * @param classes Array of class names or falsy values.
+ * @returns A single space-separated string of valid class names.
  */
-export function formatDateTime(dateString: string): string {
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return 'Invalid Date';
-    }
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date);
-  } catch (error) {
-    return 'Invalid Date';
+export const cn = (...classes: (string | undefined | null | false)[]): string => {
+  return classes.filter(Boolean).join(' ');
+};
+
+/**
+ * Generates standard headers for API requests.
+ * @param token Optional authentication token.
+ * @returns HeadersInit object ready for fetch().
+ */
+export const getStandardHeaders = (token?: string): HeadersInit => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
-}
+  
+  return headers;
+};
 
 /**
- * Maps a ServerState to a HeroUI color variant for Chips/Badges.
- * @param status The server state.
- * @returns A valid HeroUI color string.
+ * Utility to simulate network delay for mock data loading.
+ * @param ms Milliseconds to delay.
+ * @returns Promise that resolves after the specified delay.
  */
-export function getStatusColor(status: ServerState): "success" | "warning" | "danger" | "default" {
-  switch (status) {
-    case 'operational':
-      return 'success';
-    case 'degraded':
-      return 'warning';
-    case 'outage':
-      return 'danger';
-    case 'maintenance':
-      return 'default';
-    default:
-      return 'default';
-  }
-}
+export const delay = (ms: number): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
 
 /**
- * Formats an uptime percentage to a standard string.
- * @param percentage The uptime percentage (e.g., 99.99).
- * @returns Formatted string (e.g., "99.99%").
+ * Wraps mock data in a standard API response format.
+ * @param data The data payload.
+ * @param success Whether the mock request was successful.
+ * @param error Optional error message.
+ * @returns Standardized ApiResponse object.
  */
-export function formatUptime(percentage: number): string {
-  // Ensure we don't show more than 2 decimal places, but drop trailing zeros if exact
-  return `${Number(percentage.toFixed(2))}%`;
-}
+export const createMockResponse = <T>(data: T, success: boolean = true, error?: string): ApiResponse<T> => {
+  return {
+    success,
+    data: success ? data : undefined,
+    error: !success ? error : undefined,
+  };
+};
 
 /**
- * Delays execution for a given number of milliseconds (useful for simulating network latency).
- * @param ms Milliseconds to wait.
- * @returns A promise that resolves after the specified delay.
+ * Generates a simple unique ID for mock entities.
+ * @returns A random alphanumeric string.
  */
-export function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+export const generateId = (): string => {
+  return Math.random().toString(36).substring(2, 11);
+};
