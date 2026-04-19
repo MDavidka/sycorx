@@ -1,80 +1,80 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Light Mode Tokens - Cloud-Native Professionalism */
-    --color-primary: #006FEE; /* Vibrant Electric Blue */
-    --color-secondary: #18181B; /* Deep Indigo/Navy Base */
-    --color-accent: #17C964; /* Success/Active Green */
+    /* Nivle Brand Colors - Dark Mode First (Tech-Forward & Reliable) */
+    --color-bg: #0A192F; /* Deep Midnight Blue */
+    --color-bg-surface: #112240; /* Slightly lighter for cards/panels */
+    --color-bg-surface-hover: #233554; /* Hover state for interactive surfaces */
     
-    --color-bg: #FFFFFF; /* Crisp White */
-    --color-surface: #F4F4F5; /* Light Gray Surface */
-    --color-text: #11181C; /* Dark Text */
-    --color-muted: #71717A; /* Muted Text */
-    --color-border: #E4E4E7; /* Light Border */
-
-    --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --color-primary: #64FFDA; /* Electric Cyan */
+    --color-primary-hover: #52e0c4; /* Slightly darker cyan for hover */
+    
+    --color-text: #CCD6F6; /* Light Slate for primary text */
+    --color-text-muted: #8892B0; /* Slate Grey for secondary text */
+    
+    --color-accent: #FF6B6B; /* Red/Coral for destructive actions or alerts */
+    --color-success: #2ecc71; /* Green for active statuses */
+    --color-warning: #f1c40f; /* Yellow for pending statuses */
+    
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   }
 
-  .dark {
-    /* Dark Mode Tokens - Developer-First Aesthetic */
-    --color-primary: #338EF7; /* Lighter Electric Blue for contrast */
-    --color-secondary: #FAFAFA; /* White for contrast */
-    --color-accent: #45D483; /* Bright Success Green */
-    
-    --color-bg: #020617; /* Deep Navy/Slate Base */
-    --color-surface: #0F172A; /* Elevated Navy Surface */
-    --color-text: #F8FAFC; /* Crisp White Text */
-    --color-muted: #94A3B8; /* Muted Slate Text */
-    --color-border: #1E293B; /* Dark Slate Border */
-  }
-
+  /* Apply base styles to the document */
   html, body {
+    @apply bg-[#0A192F] text-[#CCD6F6] font-sans antialiased min-h-screen;
     background-color: var(--color-bg);
     color: var(--color-text);
-    font-family: var(--font-body);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    scroll-behavior: smooth;
-    min-height: 100vh;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+  /* Custom selection color */
+  ::selection {
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
   }
 }
 
 @layer utilities {
-  /* Custom utility for glassmorphism effects often used in modern hosting sites */
+  /* Hide scrollbar for clean UI in specific containers */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* Custom global scrollbar for the dark theme */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-bg-surface-hover);
+    border-radius: 5px;
+    border: 2px solid var(--color-bg);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+  }
+
+  /* Glassmorphism utility for modern tech feel */
   .glass-panel {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    @apply bg-[#112240]/80 backdrop-blur-md border border-[#233554];
   }
-
-  .dark .glass-panel {
-    background: rgba(15, 23, 42, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  /* Subtle gradient text utility */
+  
+  /* Text gradient utility for headings */
   .text-gradient {
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-image: linear-gradient(to right, var(--color-primary), #8B5CF6);
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#64FFDA] to-[#CCD6F6];
   }
-}
-
-/* HeroUI specific overrides or enhancements if needed */
-.heroui-navbar {
-  border-bottom: 1px solid var(--color-border);
 }

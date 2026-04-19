@@ -1,92 +1,95 @@
-/**
- * Shared TypeScript interfaces and types for the Nivle Hosting platform.
- */
+export interface SiteConfig {
+  name: string;
+  description: string;
+  url: string;
+  links: {
+    twitter?: string;
+    github?: string;
+    support?: string;
+  };
+}
 
 export interface NavItem {
   label: string;
   href: string;
+  isExternal?: boolean;
+  requiresAuth?: boolean;
 }
 
-export interface SiteConfig {
-  name: string;
-  description: string;
-  navItems: NavItem[];
-}
-
-export type PlanType = 'shared' | 'vps' | 'dedicated';
-export type BillingCycle = 'monthly' | 'yearly';
+export type PlanType = 'Shared' | 'VPS' | 'Dedicated';
 
 export interface HostingPlan {
   _id?: string;
+  id: string;
   name: string;
   type: PlanType;
-  price: number;
-  billingCycle: BillingCycle;
-  features: string[];
+  priceMonthly: number;
+  priceYearly: number;
   description: string;
+  features: string[];
+  specs: {
+    cpu: string;
+    ram: string;
+    storage: string;
+    bandwidth: string;
+  };
   isPopular?: boolean;
-  cpu: string;
-  ram: string;
-  storage: string;
-  bandwidth: string;
 }
 
-export type UserRole = 'admin' | 'customer';
+export interface ActiveService {
+  id: string;
+  planId: string;
+  planName: string;
+  status: 'Active' | 'Suspended' | 'Pending' | 'Cancelled';
+  ipAddress?: string;
+  domain?: string;
+  billingCycle: 'Monthly' | 'Yearly';
+  nextBillingDate: string;
+  createdAt: string;
+}
 
 export interface User {
   _id?: string;
+  id: string;
   name: string;
   email: string;
-  role: UserRole;
+  avatarUrl?: string;
+  role: 'Customer' | 'Admin';
+  joinedAt: string;
+  activeServices: ActiveService[];
+}
+
+export type TicketStatus = 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+export type TicketPriority = 'Low' | 'Medium' | 'High' | 'Critical';
+
+export interface TicketMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  isAdmin: boolean;
+  content: string;
   createdAt: string;
 }
-
-export type ServiceStatus = 'active' | 'suspended' | 'pending' | 'cancelled';
-
-export interface ActiveService {
-  _id?: string;
-  userId: string;
-  planId: string;
-  planName: string; // Denormalized for easier display
-  domain?: string;
-  ipAddress?: string;
-  status: ServiceStatus;
-  startDate: string;
-  renewalDate: string;
-}
-
-export type TicketStatus = 'open' | 'in-progress' | 'closed';
-export type TicketPriority = 'low' | 'medium' | 'high';
 
 export interface Ticket {
   _id?: string;
+  id: string;
   userId: string;
   subject: string;
-  message: string;
   status: TicketStatus;
   priority: TicketPriority;
+  relatedServiceId?: string;
   createdAt: string;
   updatedAt: string;
+  messages: TicketMessage[];
 }
 
-export interface TicketReply {
-  _id?: string;
-  ticketId: string;
-  userId: string;
-  message: string;
-  isAdminReply: boolean;
-  createdAt: string;
-}
-
-// API Response Types
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
+export interface DatabaseResponse<T> {
+  documents?: T[];
+  document?: T;
+  insertedId?: string;
+  matchedCount?: number;
+  modifiedCount?: number;
+  deletedCount?: number;
   error?: string;
-}
-
-export interface PaginatedResponse<T> extends ApiResponse<T[]> {
-  total: number;
-  page: number;
-  limit: number;
 }

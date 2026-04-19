@@ -1,91 +1,125 @@
-import { ApiResponse } from './types';
+import { TicketStatus, TicketPriority, ActiveService } from './types';
 
 /**
- * Formats a number as a currency string.
- * @param amount The number to format.
- * @param currency The currency code (default: USD).
- * @returns Formatted currency string.
+ * Formats a numeric amount into a localized currency string.
+ * @param amount - The number to format
+ * @param currency - The currency code (default: 'USD')
+ * @returns Formatted currency string (e.g., "$10.00")
  */
-export const formatCurrency = (amount: number, currency: string = 'USD'): string => {
+export function formatCurrency(amount: number, currency: string = 'USD'): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(amount);
-};
+}
 
 /**
- * Formats an ISO date string into a human-readable format.
- * @param dateString The ISO date string to format.
- * @returns Formatted date string (e.g., "Oct 24, 2023").
+ * Formats a date string or Date object into a readable date string.
+ * @param dateInput - ISO date string or Date object
+ * @returns Formatted date string (e.g., "Oct 24, 2023")
  */
-export const formatDate = (dateString: string): string => {
-  try {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    }).format(new Date(dateString));
-  } catch (e) {
-    return dateString;
+export function formatDate(dateInput: string | Date): string {
+  if (!dateInput) return '';
+  const date = new Date(dateInput);
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(date);
+}
+
+/**
+ * Formats a date string or Date object into a readable date and time string.
+ * @param dateInput - ISO date string or Date object
+ * @returns Formatted date and time string (e.g., "Oct 24, 2023, 14:30")
+ */
+export function formatDateTime(dateInput: string | Date): string {
+  if (!dateInput) return '';
+  const date = new Date(dateInput);
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}
+
+/**
+ * Calculates the number of days remaining until a target date.
+ * Useful for displaying "Next Billing Date" countdowns.
+ * @param targetDate - ISO date string or Date object
+ * @returns Number of days (can be negative if in the past)
+ */
+export function calculateDaysUntil(targetDate: string | Date): number {
+  if (!targetDate) return 0;
+  const target = new Date(targetDate).getTime();
+  const now = new Date().getTime();
+  const diff = target - now;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Valid color props for HeroUI Chip/Badge components.
+ */
+export type HeroUIStatusColor = "default" | "primary" | "secondary" | "success" | "warning" | "danger";
+
+/**
+ * Maps various domain statuses (Service, Ticket, Priority) to HeroUI color variants.
+ * @param status - The status string to evaluate
+ * @returns A valid HeroUI color string
+ */
+export function getStatusColor(status: ActiveService['status'] | TicketStatus | TicketPriority | string): HeroUIStatusColor {
+  const normalized = status.toLowerCase();
+  
+  switch (normalized) {
+    // Success states
+    case 'active':
+    case 'resolved':
+      return 'success';
+      
+    // Warning states
+    case 'pending':
+    case 'in progress':
+    case 'medium':
+      return 'warning';
+      
+    // Danger/Critical states
+    case 'suspended':
+    case 'cancelled':
+    case 'critical':
+      return 'danger';
+      
+    // Primary/Actionable states
+    case 'open':
+    case 'high':
+      return 'primary';
+      
+    // Default/Neutral states
+    case 'closed':
+    case 'low':
+    default:
+      return 'default';
   }
-};
+}
 
 /**
- * Simple utility for conditionally joining CSS class names.
- * Useful for combining Tailwind classes dynamically.
- * @param classes Array of class names or falsy values.
- * @returns A single space-separated string of valid class names.
+ * Simple utility for conditionally joining class names, 
+ * acting as a lightweight alternative to clsx/tailwind-merge.
+ * @param classes - Array of class strings or falsy values
+ * @returns Joined class string
  */
-export const cn = (...classes: (string | undefined | null | false)[]): string => {
+export function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
-};
+}
 
 /**
- * Generates standard headers for API requests.
- * @param token Optional authentication token.
- * @returns HeadersInit object ready for fetch().
+ * Generates a simple random ID for optimistic UI updates.
+ * Note: Not for secure cryptographic use.
+ * @returns A random alphanumeric string
  */
-export const getStandardHeaders = (token?: string): HeadersInit => {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  };
-  
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  
-  return headers;
-};
-
-/**
- * Utility to simulate network delay for mock data loading.
- * @param ms Milliseconds to delay.
- * @returns Promise that resolves after the specified delay.
- */
-export const delay = (ms: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-};
-
-/**
- * Wraps mock data in a standard API response format.
- * @param data The data payload.
- * @param success Whether the mock request was successful.
- * @param error Optional error message.
- * @returns Standardized ApiResponse object.
- */
-export const createMockResponse = <T>(data: T, success: boolean = true, error?: string): ApiResponse<T> => {
-  return {
-    success,
-    data: success ? data : undefined,
-    error: !success ? error : undefined,
-  };
-};
-
-/**
- * Generates a simple unique ID for mock entities.
- * @returns A random alphanumeric string.
- */
-export const generateId = (): string => {
-  return Math.random().toString(36).substring(2, 11);
-};
+export function generateId(): string {
+  return Math.random().toString(36).substring(2, 9);
+}
