@@ -1,75 +1,106 @@
 /**
- * Represents the core state of the player's game.
- * This is the object that will be saved to and loaded from local storage.
+ * Shared TypeScript interfaces and types for the Nivle Hosting platform.
  */
-export interface GameState {
-    /** The player's chosen display name */
-    playerName: string;
-    /** Current number of cookies available to spend */
-    cookies: number;
-    /** Total number of cookies ever baked (used for leaderboard score) */
-    totalCookies: number;
-    /** Current passive cookie generation rate per second */
-    cookiesPerSecond: number;
-    /** A map of upgrade IDs to the quantity owned by the player */
-    inventory: Record<string, number>;
-    /** Unix timestamp of the last time the game was saved (used for offline progress) */
-    lastSaveTime: number;
+
+// ==========================================
+// Site Configuration Types
+// ==========================================
+
+export interface NavItem {
+  label: string;
+  href: string;
 }
 
-/**
- * Defines a purchasable building/upgrade in the shop.
- */
-export interface UpgradeItem {
-    /** Unique identifier for the upgrade (e.g., 'cursor', 'grandma') */
-    id: string;
-    /** Display name of the upgrade */
-    name: string;
-    /** Flavor text or description */
-    description: string;
-    /** The initial cost of the first unit */
-    baseCost: number;
-    /** The multiplier applied to the cost for each subsequent purchase (typically 1.15) */
-    costMultiplier: number;
-    /** The amount of Cookies Per Second (CPS) one unit of this upgrade provides */
-    baseCps: number;
-    /** URL to the placeholder image/icon for this upgrade */
-    iconUrl: string;
+export interface SiteConfig {
+  name: string;
+  description: string;
+  navItems: NavItem[];
 }
 
-/**
- * Represents a player's score entry on the global leaderboard.
- * Matches the schema expected by the MongoDB database.
- */
-export interface PlayerScore {
-    /** Optional MongoDB document ID */
-    _id?: string;
-    /** The player's display name */
-    playerName: string;
-    /** The total number of cookies ever baked by the player */
-    score: number;
-    /** ISO 8601 timestamp of when the score was last updated */
-    updatedAt: string;
+// ==========================================
+// Domain Models (Database Entities)
+// ==========================================
+
+export type PlanType = 'shared' | 'vps' | 'dedicated' | 'cloud';
+
+export interface HostingPlan {
+  _id: string;
+  name: string;
+  description: string;
+  priceMonthly: number;
+  priceYearly: number;
+  features: string[];
+  type: PlanType;
+  isPopular?: boolean;
+  specs: {
+    cpu: string;
+    ram: string;
+    storage: string;
+    bandwidth: string;
+  };
 }
 
-/**
- * Defines the available views in the application routing.
- */
-export type ViewState = 'game' | 'leaderboard' | 'settings';
+export type ServerState = 'operational' | 'degraded' | 'outage' | 'maintenance';
 
-/**
- * Configuration object for initializing the game engine.
- */
-export interface GameEngineConfig {
-    /** The DOM element where the app is mounted */
-    rootElement: HTMLElement;
-    /** The interval in milliseconds for the main game loop (e.g., 1000 / 60 for 60fps) */
-    tickRateMs: number;
-    /** The interval in milliseconds for auto-saving to local storage */
-    saveIntervalMs: number;
+export interface ServerStatus {
+  _id: string;
+  serviceName: string;
+  region: string;
+  status: ServerState;
+  uptimePercentage: number;
+  lastUpdated: string; // ISO Date string
+  incidentMessage?: string;
 }
 
-/**
- * Callback type for when the game state changes, used to trigger UI re-renders.
- */
-export type StateChangeCallback = (newState: GameState) => void;
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  joinedAt: string; // ISO Date string
+}
+
+export type SubscriptionStatus = 'active' | 'pending' | 'suspended' | 'cancelled';
+
+export interface Subscription {
+  _id: string;
+  userId: string;
+  planId: string;
+  domain: string;
+  status: SubscriptionStatus;
+  ipAddress?: string;
+  billingCycle: 'monthly' | 'yearly';
+  nextBillingDate: string; // ISO Date string
+  createdAt: string; // ISO Date string
+}
+
+// ==========================================
+// Component Prop Types
+// ==========================================
+
+export interface PlanCardProps {
+  plan: HostingPlan;
+  onSelect?: (plan: HostingPlan) => void;
+  billingCycle?: 'monthly' | 'yearly';
+}
+
+export interface StatusTableProps {
+  servers: ServerStatus[];
+  isLoading?: boolean;
+}
+
+// ==========================================
+// API Response Types
+// ==========================================
+
+export interface ApiResponse<T> {
+  data?: T;
+  error?: string;
+  success: boolean;
+}
+
+export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+  total: number;
+  page: number;
+  limit: number;
+}
