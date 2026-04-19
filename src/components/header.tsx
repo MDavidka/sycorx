@@ -1,242 +1,356 @@
-import React, { useState } from 'react';
-import {
-  Navbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-  NavbarMenuToggle,
-  NavbarMenu,
-  NavbarMenuItem,
-  Link,
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Avatar
-} from '@heroui/react';
-import { NavItem } from '../types';
+x
+import React, { useState, useEffect } from 'react';
+import { Server, Menu, X, Moon, Sun, User, LogOut, Settings, LayoutDashboard } from 'lucide-react';
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+import * as AvatarPrimitive from '@radix-ui/react-avatar';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import { cn } from '../utils';
+import type { UserSession, NavItem } from '../types';
+
+// ============================================================================
+// SYNTHESIZED SHADCN/UI COMPONENTS
+// (Inlined here to ensure standalone functionality as per requirements)
+// ============================================================================
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+);
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
+Button.displayName = "Button";
+
+const Avatar = React.forwardRef<
+  React.ElementRef<typeof AvatarPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <AvatarPrimitive.Root
+    ref={ref}
+    className={cn("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full", className)}
+    {...props}
+  />
+));
+Avatar.displayName = AvatarPrimitive.Root.displayName;
+
+const AvatarImage = React.forwardRef<
+  React.ElementRef<typeof AvatarPrimitive.Image>,
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
+>(({ className, ...props }, ref) => (
+  <AvatarPrimitive.Image
+    ref={ref}
+    className={cn("aspect-square h-full w-full", className)}
+    {...props}
+  />
+));
+AvatarImage.displayName = AvatarPrimitive.Image.displayName;
+
+const AvatarFallback = React.forwardRef<
+  React.ElementRef<typeof AvatarPrimitive.Fallback>,
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
+>(({ className, ...props }, ref) => (
+  <AvatarPrimitive.Fallback
+    ref={ref}
+    className={cn("flex h-full w-full items-center justify-center rounded-full bg-muted", className)}
+    {...props}
+  />
+));
+AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
+
+// ============================================================================
+// HEADER COMPONENT
+// ============================================================================
 
 export interface HeaderProps {
   currentPath: string;
   onNavigate: (path: string) => void;
-  isLoggedIn: boolean;
-  onLogin: () => void;
-  onLogout: () => void;
+  user?: UserSession | null;
+  onLogin?: () => void;
+  onLogout?: () => void;
 }
 
-const publicNavItems: NavItem[] = [
-  { label: 'Home', href: '/' },
-  { label: 'Pricing', href: '/pricing' },
+const NAV_ITEMS: NavItem[] = [
+  { title: 'Home', href: '/' },
+  { title: 'Pricing', href: '/pricing' },
+  { title: 'Dashboard', href: '/dashboard' },
+  { title: 'Support', href: '/support' },
 ];
 
-const privateNavItems: NavItem[] = [
-  { label: 'Dashboard', href: '/dashboard', requiresAuth: true },
-  { label: 'Support', href: '/support', requiresAuth: true },
-];
+export function Header({ currentPath, onNavigate, user, onLogin, onLogout }: HeaderProps) {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
 
-export function Header({
-  currentPath,
-  onNavigate,
-  isLoggedIn,
-  onLogin,
-  onLogout
-}: HeaderProps): JSX.Element {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // Handle scroll effect for sticky header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  const handleNavigation = (path: string) => {
-    onNavigate(path);
-    setIsMenuOpen(false);
+  // Initialize theme state
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    setIsDarkTheme(isDark);
+  }, []);
+
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    if (root.classList.contains('dark')) {
+      root.classList.remove('dark');
+      setIsDarkTheme(false);
+    } else {
+      root.classList.add('dark');
+      setIsDarkTheme(true);
+    }
   };
 
-  const navItems = isLoggedIn 
-    ? [...publicNavItems, ...privateNavItems] 
-    : publicNavItems;
+  const handleNavigation = (href: string) => {
+    onNavigate(href);
+    setIsMobileMenuOpen(false);
+  };
 
   return (
-    <Navbar
-      isMenuOpen={isMenuOpen}
-      onMenuOpenChange={setIsMenuOpen}
-      maxWidth="xl"
-      position="sticky"
-      className="bg-[#0A192F]/90 backdrop-blur-md border-b border-[#233554]"
+    <header
+      className={cn(
+        "sticky top-0 z-50 w-full border-b transition-all duration-200",
+        isScrolled
+          ? "border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm"
+          : "border-transparent bg-background"
+      )}
     >
-      {/* Mobile Menu Toggle & Brand */}
-      <NavbarContent className="sm:hidden" justify="start">
-        <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} />
-        <NavbarBrand>
-          <div 
-            className="flex items-center gap-2 cursor-pointer" 
-            onClick={() => handleNavigation('/')}
-          >
-            <div className="w-8 h-8 bg-[#64FFDA] rounded flex items-center justify-center">
-              <span className="text-[#0A192F] font-bold text-xl leading-none">n</span>
-            </div>
-            <p className="font-bold text-inherit text-xl tracking-tight text-[#CCD6F6]">nivle</p>
+      <div className="container mx-auto px-4 md:px-6 flex h-16 items-center justify-between">
+        {/* Logo & Brand */}
+        <div 
+          className="flex items-center gap-2 cursor-pointer" 
+          onClick={() => handleNavigation('/')}
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Server className="h-5 w-5" />
           </div>
-        </NavbarBrand>
-      </NavbarContent>
+          <span className="text-xl font-bold tracking-tight text-foreground">
+            Nexus<span className="text-primary">Host</span>
+          </span>
+        </div>
 
-      {/* Desktop Brand */}
-      <NavbarContent className="hidden sm:flex pr-3" justify="start">
-        <NavbarBrand>
-          <div 
-            className="flex items-center gap-2 cursor-pointer transition-transform hover:scale-105" 
-            onClick={() => handleNavigation('/')}
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-6">
+          {NAV_ITEMS.map((item) => (
+            <button
+              key={item.href}
+              onClick={() => handleNavigation(item.href)}
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                currentPath === item.href
+                  ? "text-foreground"
+                  : "text-muted-foreground"
+              )}
+            >
+              {item.title}
+            </button>
+          ))}
+        </nav>
+
+        {/* Right Actions (Theme, Auth, Mobile Toggle) */}
+        <div className="flex items-center gap-2 md:gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label="Toggle theme"
           >
-            <div className="w-8 h-8 bg-[#64FFDA] rounded flex items-center justify-center shadow-[0_0_15px_rgba(100,255,218,0.3)]">
-              <span className="text-[#0A192F] font-bold text-xl leading-none">n</span>
-            </div>
-            <p className="font-bold text-inherit text-xl tracking-tight text-[#CCD6F6]">nivle</p>
+            {isDarkTheme ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+
+          <div className="hidden md:flex items-center gap-4">
+            {user ? (
+              <DropdownMenuPrimitive.Root>
+                <DropdownMenuPrimitive.Trigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9 border border-border">
+                      <AvatarImage src={user.avatarUrl} alt={user.name} />
+                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                        {user.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuPrimitive.Trigger>
+                <DropdownMenuPrimitive.Portal>
+                  <DropdownMenuPrimitive.Content 
+                    className="z-50 min-w-[12rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in-80 zoom-in-95" 
+                    align="end" 
+                    sideOffset={8}
+                  >
+                    <div className="px-2 py-2.5">
+                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground mt-1">{user.email}</p>
+                    </div>
+                    <DropdownMenuPrimitive.Separator className="-mx-1 my-1 h-px bg-muted" />
+                    <DropdownMenuPrimitive.Item 
+                      className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                      onClick={() => handleNavigation('/dashboard')}
+                    >
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </DropdownMenuPrimitive.Item>
+                    <DropdownMenuPrimitive.Item 
+                      className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </DropdownMenuPrimitive.Item>
+                    <DropdownMenuPrimitive.Separator className="-mx-1 my-1 h-px bg-muted" />
+                    <DropdownMenuPrimitive.Item 
+                      className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 text-sm outline-none transition-colors focus:bg-destructive/10 focus:text-destructive text-destructive data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                      onClick={onLogout}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </DropdownMenuPrimitive.Item>
+                  </DropdownMenuPrimitive.Content>
+                </DropdownMenuPrimitive.Portal>
+              </DropdownMenuPrimitive.Root>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={onLogin} className="text-sm font-medium">
+                  Log in
+                </Button>
+                <Button onClick={onLogin} className="text-sm font-medium">
+                  Sign up
+                </Button>
+              </>
+            )}
           </div>
-        </NavbarBrand>
-      </NavbarContent>
 
-      {/* Desktop Navigation Links */}
-      <NavbarContent className="hidden sm:flex gap-6" justify="center">
-        {navItems.map((item) => {
-          const isActive = currentPath === item.href;
-          return (
-            <NavbarItem key={item.href} isActive={isActive}>
-              <Link
-                color={isActive ? "primary" : "foreground"}
-                className={`cursor-pointer font-medium transition-colors ${
-                  isActive ? 'text-[#64FFDA]' : 'text-[#8892B0] hover:text-[#CCD6F6]'
-                }`}
-                onPress={() => handleNavigation(item.href)}
-                aria-current={isActive ? "page" : undefined}
-              >
-                {item.label}
-              </Link>
-            </NavbarItem>
-          );
-        })}
-      </NavbarContent>
+          {/* Mobile Menu Toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden text-foreground"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+        </div>
+      </div>
 
-      {/* End Content (Auth / User Profile) */}
-      <NavbarContent justify="end">
-        {!isLoggedIn ? (
-          <>
-            <NavbarItem className="hidden lg:flex">
-              <Button 
-                onPress={onLogin} 
-                variant="light" 
-                className="text-[#CCD6F6] font-medium hover:bg-[#112240]"
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-border bg-background px-4 py-4 shadow-lg animate-in slide-in-from-top-2">
+          <nav className="flex flex-col space-y-4">
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item.href}
+                onClick={() => handleNavigation(item.href)}
+                className={cn(
+                  "text-left text-base font-medium transition-colors hover:text-primary px-2 py-1.5 rounded-md",
+                  currentPath === item.href
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-accent"
+                )}
               >
-                Login
-              </Button>
-            </NavbarItem>
-            <NavbarItem>
-              <Button 
-                onPress={onLogin} 
-                color="primary" 
-                variant="flat"
-                className="font-medium bg-[#64FFDA]/10 text-[#64FFDA] hover:bg-[#64FFDA]/20"
-              >
-                Sign Up
-              </Button>
-            </NavbarItem>
-          </>
-        ) : (
-          <NavbarItem>
-            <Dropdown placement="bottom-end" className="bg-[#112240] border border-[#233554]">
-              <DropdownTrigger>
-                <Avatar
-                  isBordered
-                  as="button"
-                  className="transition-transform"
-                  color="primary"
-                  name="User"
-                  size="sm"
-                  src="https://placehold.co/150x150.png?text=U"
-                />
-              </DropdownTrigger>
-              <DropdownMenu aria-label="Profile Actions" variant="flat">
-                <DropdownItem key="profile" className="h-14 gap-2 text-[#CCD6F6]">
-                  <p className="font-semibold">Signed in as</p>
-                  <p className="font-semibold text-[#8892B0]">user@nivle.com</p>
-                </DropdownItem>
-                <DropdownItem 
-                  key="dashboard" 
-                  className="text-[#CCD6F6]"
-                  onPress={() => handleNavigation('/dashboard')}
-                >
-                  Dashboard
-                </DropdownItem>
-                <DropdownItem 
-                  key="support" 
-                  className="text-[#CCD6F6]"
-                  onPress={() => handleNavigation('/support')}
-                >
-                  Support Tickets
-                </DropdownItem>
-                <DropdownItem 
-                  key="settings" 
-                  className="text-[#CCD6F6]"
-                >
-                  Account Settings
-                </DropdownItem>
-                <DropdownItem 
-                  key="logout" 
-                  color="danger" 
-                  className="text-[#FF6B6B]"
-                  onPress={() => {
-                    onLogout();
-                    handleNavigation('/');
-                  }}
-                >
-                  Log Out
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </NavbarItem>
-        )}
-      </NavbarContent>
-
-      {/* Mobile Menu */}
-      <NavbarMenu className="bg-[#0A192F]/95 backdrop-blur-md pt-6 border-t border-[#233554]">
-        {navItems.map((item, index) => {
-          const isActive = currentPath === item.href;
-          return (
-            <NavbarMenuItem key={`${item.label}-${index}`}>
-              <Link
-                color={isActive ? "primary" : "foreground"}
-                className={`w-full text-lg py-2 ${
-                  isActive ? 'text-[#64FFDA] font-semibold' : 'text-[#8892B0]'
-                }`}
-                onPress={() => handleNavigation(item.href)}
-                size="lg"
-              >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          );
-        })}
-        {!isLoggedIn && (
-          <NavbarMenuItem className="mt-4 flex flex-col gap-3">
-            <Button 
-              onPress={() => {
-                onLogin();
-                setIsMenuOpen(false);
-              }} 
-              variant="bordered" 
-              className="w-full border-[#233554] text-[#CCD6F6]"
-            >
-              Login
-            </Button>
-            <Button 
-              onPress={() => {
-                onLogin();
-                setIsMenuOpen(false);
-              }} 
-              color="primary" 
-              className="w-full bg-[#64FFDA] text-[#0A192F] font-semibold"
-            >
-              Sign Up
-            </Button>
-          </NavbarMenuItem>
-        )}
-      </NavbarMenu>
-    </Navbar>
+                {item.title}
+              </button>
+            ))}
+            
+            <div className="pt-4 mt-2 border-t border-border flex flex-col gap-3">
+              {user ? (
+                <>
+                  <div className="flex items-center gap-3 px-2 mb-2">
+                    <Avatar className="h-10 w-10 border border-border">
+                      <AvatarImage src={user.avatarUrl} alt={user.name} />
+                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                        {user.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{user.email}</p>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start" 
+                    onClick={() => handleNavigation('/dashboard')}
+                  >
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10" 
+                    onClick={() => {
+                      if (onLogout) onLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </Button>
+                </>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Button variant="outline" className="w-full" onClick={() => {
+                    if (onLogin) onLogin();
+                    setIsMobileMenuOpen(false);
+                  }}>
+                    Log in
+                  </Button>
+                  <Button className="w-full" onClick={() => {
+                    if (onLogin) onLogin();
+                    setIsMobileMenuOpen(false);
+                  }}>
+                    Sign up
+                  </Button>
+                </div>
+              )}
+            </div>
+          </nav>
+        </div>
+      )}
+    </header>
   );
 }

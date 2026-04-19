@@ -1,89 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom/client';
-import { HeroUIProvider, Button } from '@heroui/react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { createRoot } from 'react-dom/client';
 import './style.css';
 
-// Layout Components
+// Import Types
+import type { UserSession } from './types';
+
+// Import Layout Components
 import { Header } from './components/header';
 import { Footer } from './components/footer';
 
-// Page Components
+// Import Page Components
 import { HomePage } from './components/home-page';
 import { PricingPage } from './components/pricing-page';
 import { DashboardPage } from './components/dashboard-page';
 import { SupportPage } from './components/support-page';
 
+// Mock User for Demonstration
+const MOCK_USER: UserSession = {
+  id: 'usr_01H9X',
+  name: 'Alex Developer',
+  email: 'alex@example.com',
+  role: 'user',
+  avatarUrl: 'https://i.pravatar.cc/150?u=alex'
+};
+
 function App() {
-  // Simple client-side routing state
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
-  
-  // Mock authentication state for the prototype
-  // In a real app, this would be managed by an AuthProvider (e.g., JWT, session)
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<UserSession | null>(null);
 
   // Handle browser back/forward navigation
   useEffect(() => {
     const handlePopState = () => {
       setCurrentPath(window.location.pathname);
     };
-    
+
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Navigation helper
-  const navigate = (path: string) => {
+  // Custom navigation function
+  const navigate = useCallback((path: string) => {
+    // Handle hash links (e.g., /pricing#vps)
+    if (path.includes('#')) {
+      const [basePath, hash] = path.split('#');
+      if (basePath && basePath !== currentPath) {
+        window.history.pushState({}, '', basePath);
+        setCurrentPath(basePath);
+      }
+      // Allow browser to handle the hash scroll after a short delay for render
+      setTimeout(() => {
+        const element = document.getElementById(hash);
+        if (element) element.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+      return;
+    }
+
     window.history.pushState({}, '', path);
     setCurrentPath(path);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    window.scrollTo(0, 0);
+  }, [currentPath]);
 
-  // Auth handlers
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    // Redirect to dashboard after login if on a public page
-    if (currentPath === '/' || currentPath === '/pricing') {
+  // Mock Authentication Handlers
+  const handleLogin = useCallback(() => {
+    setUser(MOCK_USER);
+    // Optionally redirect to dashboard on login if on home page
+    if (currentPath === '/') {
       navigate('/dashboard');
     }
-  };
+  }, [currentPath, navigate]);
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    // Redirect to home if on a protected route
-    if (currentPath === '/dashboard' || currentPath === '/support') {
-      navigate('/');
-    }
-  };
+  const handleLogout = useCallback(() => {
+    setUser(null);
+    navigate('/');
+  }, [navigate]);
 
-  // Protected Route Wrapper
-  const renderProtectedRoute = (Component: React.ComponentType<{ onNavigate: (path: string) => void }>) => {
-    if (!isLoggedIn) {
-      return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6 w-full">
-          <div className="w-20 h-20 bg-[#233554] rounded-full flex items-center justify-center mb-6">
-            <svg className="w-10 h-10 text-[#8892B0]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </div>
-          <h2 className="text-3xl font-bold text-[#CCD6F6] mb-4">Authentication Required</h2>
-          <p className="text-[#8892B0] max-w-md mb-8">
-            You need to be logged in to access this page. Please sign in to manage your hosting services and support tickets.
-          </p>
-          <Button 
-            color="primary" 
-            size="lg"
-            className="bg-[#64FFDA] text-[#0A192F] font-semibold px-8"
-            onPress={handleLogin}
-          >
-            Log In Now
-          </Button>
-        </div>
-      );
-    }
-    return <Component onNavigate={navigate} />;
-  };
-
-  // Route matching
+  // Route matching logic
   const renderPage = () => {
     switch (currentPath) {
       case '/':
@@ -91,59 +82,63 @@ function App() {
       case '/pricing':
         return <PricingPage onNavigate={navigate} />;
       case '/dashboard':
-        return renderProtectedRoute(DashboardPage);
+        return <DashboardPage onNavigate={navigate} />;
       case '/support':
-        return renderProtectedRoute(SupportPage);
+        return <SupportPage onNavigate={navigate} />;
       default:
         return (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6 w-full">
-            <h1 className="text-8xl font-bold text-[#64FFDA] mb-4">404</h1>
-            <h2 className="text-3xl font-bold text-[#CCD6F6] mb-4">Page Not Found</h2>
-            <p className="text-[#8892B0] max-w-md mb-8">
-              The page you are looking for doesn't exist or has been moved.
+          <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
+            <h1 className="text-6xl font-extrabold tracking-tight text-foreground mb-4">404</h1>
+            <h2 className="text-2xl font-semibold tracking-tight mb-2">Page not found</h2>
+            <p className="text-muted-foreground mb-8 max-w-md">
+              Sorry, we couldn't find the page you're looking for. It might have been moved or deleted.
             </p>
-            <Button 
-              variant="bordered" 
-              size="lg"
-              className="border-[#233554] text-[#CCD6F6] hover:bg-[#112240]"
-              onPress={() => navigate('/')}
+            <button 
+              onClick={() => navigate('/')}
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
             >
-              Return to Home
-            </Button>
+              Return Home
+            </button>
           </div>
         );
     }
   };
 
   return (
-    <HeroUIProvider>
-      <div className="flex flex-col min-h-screen bg-[#0A192F] text-[#CCD6F6] font-sans selection:bg-[#64FFDA] selection:text-[#0A192F]">
-        <Header 
-          currentPath={currentPath} 
-          onNavigate={navigate} 
-          isLoggedIn={isLoggedIn}
-          onLogin={handleLogin}
-          onLogout={handleLogout}
-        />
-        
-        <main className="flex-grow flex flex-col items-center w-full">
-          {renderPage()}
-        </main>
-        
-        <Footer />
-      </div>
-    </HeroUIProvider>
+    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans antialiased selection:bg-primary/20 selection:text-primary">
+      <Header 
+        currentPath={currentPath} 
+        onNavigate={navigate} 
+        user={user} 
+        onLogin={handleLogin} 
+        onLogout={handleLogout} 
+      />
+      
+      <main className="flex-1 flex flex-col">
+        {renderPage()}
+      </main>
+
+      <Footer onNavigate={navigate} />
+    </div>
   );
 }
 
-// Safely mount the React application
-const rootElement = document.getElementById('root');
-if (rootElement) {
-  ReactDOM.createRoot(rootElement).render(
+// Exported initialization function to safely mount the React app
+export function init() {
+  const rootElement = document.getElementById('root');
+  
+  if (!rootElement) {
+    console.error('Failed to find the root element. Ensure index.html has a <div id="root"></div>');
+    return;
+  }
+
+  const root = createRoot(rootElement);
+  root.render(
     <React.StrictMode>
       <App />
     </React.StrictMode>
   );
-} else {
-  console.error('Failed to find the root element to mount the React application.');
 }
+
+// Execute initialization
+init();

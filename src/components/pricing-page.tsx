@@ -1,400 +1,601 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Button, 
-  Card, 
-  CardHeader, 
-  CardBody, 
-  CardFooter, 
-  Chip, 
-  Divider,
-  Switch,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Accordion,
-  AccordionItem,
-  Spinner
-} from '@heroui/react';
-import { HostingPlan } from '../types';
+  Check, 
+  Minus, 
+  HelpCircle, 
+  ArrowRight, 
+  Database,
+  Server,
+  Shield,
+  Zap,
+  ChevronDown
+} from 'lucide-react';
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import { cn, formatCurrency } from '../utils';
+import type { HostingPlan } from '../types';
 import { getHostingPlans, IS_DB_CONNECTED } from '../db';
-import { formatCurrency } from '../utils';
+import { Button } from './header';
+
+// ============================================================================
+// SYNTHESIZED SHADCN/UI COMPONENTS
+// ============================================================================
+
+const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("rounded-xl border bg-card text-card-foreground shadow", className)}
+      {...props}
+    />
+  )
+);
+Card.displayName = "Card";
+
+const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("flex flex-col space-y-1.5 p-6", className)}
+      {...props}
+    />
+  )
+);
+CardHeader.displayName = "CardHeader";
+
+const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+  ({ className, ...props }, ref) => (
+    <h3
+      ref={ref}
+      className={cn("font-semibold leading-none tracking-tight", className)}
+      {...props}
+    />
+  )
+);
+CardTitle.displayName = "CardTitle";
+
+const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, ...props }, ref) => (
+    <p
+      ref={ref}
+      className={cn("text-sm text-muted-foreground", className)}
+      {...props}
+    />
+  )
+);
+CardDescription.displayName = "CardDescription";
+
+const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  )
+);
+CardContent.displayName = "CardContent";
+
+const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("flex items-center p-6 pt-0", className)}
+      {...props}
+    />
+  )
+);
+CardFooter.displayName = "CardFooter";
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  );
+}
+
+const Table = React.forwardRef<
+  HTMLTableElement,
+  React.HTMLAttributes<HTMLTableElement>
+>(({ className, ...props }, ref) => (
+  <div className="relative w-full overflow-auto rounded-md border border-border">
+    <table
+      ref={ref}
+      className={cn("w-full caption-bottom text-sm", className)}
+      {...props}
+    />
+  </div>
+));
+Table.displayName = "Table";
+
+const TableHeader = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <thead ref={ref} className={cn("[&_tr]:border-b bg-muted/50", className)} {...props} />
+));
+TableHeader.displayName = "TableHeader";
+
+const TableBody = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <tbody
+    ref={ref}
+    className={cn("[&_tr:last-child]:border-0", className)}
+    {...props}
+  />
+));
+TableBody.displayName = "TableBody";
+
+const TableRow = React.forwardRef<
+  HTMLTableRowElement,
+  React.HTMLAttributes<HTMLTableRowElement>
+>(({ className, ...props }, ref) => (
+  <tr
+    ref={ref}
+    className={cn(
+      "border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      className
+    )}
+    {...props}
+  />
+));
+TableRow.displayName = "TableRow";
+
+const TableHead = React.forwardRef<
+  HTMLTableCellElement,
+  React.ThHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <th
+    ref={ref}
+    className={cn(
+      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      className
+    )}
+    {...props}
+  />
+));
+TableHead.displayName = "TableHead";
+
+const TableCell = React.forwardRef<
+  HTMLTableCellElement,
+  React.TdHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <td
+    ref={ref}
+    className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
+    {...props}
+  />
+));
+TableCell.displayName = "TableCell";
+
+function Skeleton({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn("animate-pulse rounded-md bg-primary/10", className)}
+      {...props}
+    />
+  );
+}
+
+// ============================================================================
+// PAGE COMPONENT
+// ============================================================================
 
 export interface PricingPageProps {
   onNavigate: (path: string) => void;
 }
 
-// Comprehensive fallback data for the pricing page
-const fallbackPlans: HostingPlan[] = [
+// Static comparison data for the detailed table
+const COMPARISON_FEATURES = [
   {
-    id: 'plan_shared_1',
-    name: 'Starter',
-    type: 'Shared',
-    priceMonthly: 5.99,
-    priceYearly: 59.99,
-    description: 'Perfect for personal blogs and small projects.',
-    features: ['1 Website', '10GB NVMe Storage', 'Free SSL', 'Unmetered Bandwidth', 'Weekly Backups'],
-    specs: { cpu: '1 Core', ram: '1 GB', storage: '10 GB', bandwidth: 'Unmetered' }
+    category: "Core Resources",
+    features: [
+      { name: "vCPU Cores", starter: "1 Core", pro: "4 Cores", enterprise: "16 Cores" },
+      { name: "RAM", starter: "2 GB", pro: "8 GB", enterprise: "32 GB" },
+      { name: "NVMe Storage", starter: "50 GB", pro: "200 GB", enterprise: "1 TB" },
+      { name: "Bandwidth", starter: "1 TB", pro: "5 TB", enterprise: "Unlimited" },
+    ]
   },
   {
-    id: 'plan_vps_1',
-    name: 'Professional',
-    type: 'VPS',
-    priceMonthly: 19.99,
-    priceYearly: 199.99,
-    description: 'Dedicated resources for growing businesses.',
-    features: ['Unlimited Websites', '50GB NVMe Storage', 'Dedicated IP', 'Root Access', 'Daily Backups'],
-    specs: { cpu: '2 Cores', ram: '4 GB', storage: '50 GB', bandwidth: '2 TB' },
-    isPopular: true
+    category: "Performance & Security",
+    features: [
+      { name: "DDoS Protection", starter: "Standard", pro: "Advanced (L7)", enterprise: "Enterprise (Always-on)" },
+      { name: "Global CDN", starter: true, pro: true, enterprise: true },
+      { name: "Dedicated IP", starter: false, pro: true, enterprise: "Up to 5" },
+      { name: "Automated Backups", starter: "Weekly", pro: "Daily", enterprise: "Hourly" },
+    ]
   },
   {
-    id: 'plan_dedi_1',
-    name: 'Enterprise',
-    type: 'Dedicated',
-    priceMonthly: 99.99,
-    priceYearly: 999.99,
-    description: 'Bare metal performance for mission-critical apps.',
-    features: ['Full Server Control', '500GB NVMe Storage', 'Advanced DDoS Protection', '24/7 Priority Support', 'Real-time Backups'],
-    specs: { cpu: '8 Cores', ram: '32 GB', storage: '500 GB', bandwidth: '10 TB' }
+    category: "Support & SLA",
+    features: [
+      { name: "Uptime Guarantee", starter: "99.9%", pro: "99.99%", enterprise: "99.999%" },
+      { name: "Support Level", starter: "Community & Email", pro: "Priority 24/7", enterprise: "Dedicated Account Manager" },
+      { name: "Response Time", starter: "< 24 hours", pro: "< 1 hour", enterprise: "< 15 minutes" },
+      { name: "Migration Assistance", starter: false, pro: true, enterprise: true },
+    ]
   }
 ];
 
-const faqs = [
+const FAQS = [
   {
     question: "Can I upgrade or downgrade my plan later?",
     answer: "Yes, you can scale your resources up or down at any time directly from your dashboard. Prorated charges or credits will be applied automatically to your account."
   },
   {
-    question: "Do you offer a money-back guarantee?",
-    answer: "We offer a 30-day money-back guarantee on all Shared and VPS hosting plans. If you're not satisfied, simply cancel within the first 30 days for a full refund."
+    question: "What payment methods do you accept?",
+    answer: "We accept all major credit cards (Visa, Mastercard, American Express), PayPal, and wire transfers for annual Enterprise plans."
   },
   {
-    question: "What kind of support do you provide?",
-    answer: "All plans include 24/7 ticket-based support. Professional and Enterprise plans include priority routing, and Enterprise includes dedicated account management."
+    question: "Is there a money-back guarantee?",
+    answer: "We offer a 30-day money-back guarantee for all new Shared and VPS hosting plans. If you're not satisfied, simply cancel within the first 30 days for a full refund."
   },
   {
-    question: "Where are your data centers located?",
-    answer: "We have data centers in New York, London, Frankfurt, Singapore, and Tokyo. You can choose your preferred region during the deployment process."
+    question: "Do you provide free migrations?",
+    answer: "Yes, our Pro and Enterprise plans include free managed migrations. Our expert team will handle moving your sites and databases with zero downtime."
+  },
+  {
+    question: "What kind of support do you offer?",
+    answer: "All plans include access to our extensive knowledge base and community forums. Pro plans include 24/7 priority ticket support, and Enterprise plans come with a dedicated account manager and Slack channel."
   }
 ];
 
-export function PricingPage({ onNavigate }: PricingPageProps): JSX.Element {
+export function PricingPage({ onNavigate }: PricingPageProps) {
   const [plans, setPlans] = useState<HostingPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isYearly, setIsYearly] = useState(false);
+  const [isAnnual, setIsAnnual] = useState(true); // Default to annual for better perceived value
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   useEffect(() => {
-    async function loadPlans() {
-      setIsLoading(true);
-      if (IS_DB_CONNECTED) {
-        try {
-          const response = await getHostingPlans();
-          if (response.documents && response.documents.length > 0) {
-            setPlans(response.documents);
-          } else {
-            setPlans(fallbackPlans);
-          }
-        } catch (error) {
-          console.error("Failed to load plans:", error);
-          setPlans(fallbackPlans);
+    let isMounted = true;
+    
+    async function fetchPlans() {
+      try {
+        setIsLoading(true);
+        const data = await getHostingPlans();
+        if (isMounted) {
+          setPlans(data);
         }
-      } else {
-        setPlans(fallbackPlans);
+      } catch (error) {
+        console.error("Failed to fetch hosting plans:", error);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
-      setIsLoading(false);
     }
 
-    loadPlans();
+    fetchPlans();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Helper to render checkmarks or text for the comparison table
-  const renderFeatureCell = (plan: HostingPlan, featureName: string) => {
-    const hasFeature = plan.features.some(f => f.toLowerCase().includes(featureName.toLowerCase()));
-    if (hasFeature) {
-      return (
-        <svg className="w-5 h-5 text-[#64FFDA] mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-      );
-    }
-    return <span className="text-[#8892B0]">-</span>;
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-[#0A192F]">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Header Section */}
-      <section className="pt-32 pb-16 px-6 text-center max-w-4xl mx-auto">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 text-[#CCD6F6]">
-          Simple, transparent pricing
-        </h1>
-        <p className="text-xl text-[#8892B0] mb-10 leading-relaxed">
-          No hidden fees. No surprise charges. Choose the plan that best fits your needs and scale as you grow.
-        </p>
+      <section className="pt-20 pb-16 md:pt-28 md:pb-20 px-4 md:px-6 text-center">
+        <div className="container mx-auto max-w-4xl">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground mb-6">
+            Plans that scale with your business
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+            Whether you're hosting a personal blog or a high-traffic enterprise application, we have a plan tailored to your needs.
+          </p>
 
-        {!IS_DB_CONNECTED && (
-          <div className="inline-block bg-[#233554]/50 border border-[#f1c40f]/30 rounded-lg p-4 mb-10 text-left">
-            <div className="flex items-start gap-3">
-              <svg className="w-6 h-6 text-[#f1c40f] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <h4 className="text-[#CCD6F6] font-semibold mb-1">Database Not Connected</h4>
-                <p className="text-[#8892B0] text-sm">
-                  Viewing static preview data. Connect your MongoDB integration to enable live pricing management.
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center gap-3 mb-12">
+            <span className={cn("text-sm font-medium", !isAnnual ? "text-foreground" : "text-muted-foreground")}>
+              Monthly billing
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isAnnual}
+              onClick={() => setIsAnnual(!isAnnual)}
+              className={cn(
+                "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                isAnnual ? "bg-primary" : "bg-input"
+              )}
+            >
+              <span
+                className={cn(
+                  "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform",
+                  isAnnual ? "translate-x-5" : "translate-x-0"
+                )}
+              />
+            </button>
+            <span className={cn("text-sm font-medium flex items-center gap-1.5", isAnnual ? "text-foreground" : "text-muted-foreground")}>
+              Annual billing
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5 bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/20">
+                Save 20%
+              </Badge>
+            </span>
+          </div>
+
+          {/* Database Connection Warning */}
+          {!IS_DB_CONNECTED && (
+            <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-700 dark:text-yellow-400 p-4 rounded-lg flex items-start gap-3 mb-10 text-left">
+              <Database className="h-5 w-5 shrink-0 mt-0.5" />
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-semibold">Database Integration Not Connected</p>
+                <p className="text-sm opacity-90">
+                  The pricing plans below are using static placeholder data. To manage real hosting plans, connect a database from the Integrations tab.
                 </p>
               </div>
             </div>
-          </div>
-        )}
-
-        <div className="flex items-center justify-center gap-4 mb-16">
-          <span className={`text-lg font-medium ${!isYearly ? 'text-[#CCD6F6]' : 'text-[#8892B0]'}`}>Monthly</span>
-          <Switch 
-            isSelected={isYearly} 
-            onValueChange={setIsYearly}
-            color="primary"
-            classNames={{
-              wrapper: "bg-[#233554] group-data-[selected=true]:bg-[#64FFDA]",
-            }}
-            aria-label="Toggle yearly billing"
-          />
-          <div className="flex items-center gap-2">
-            <span className={`text-lg font-medium ${isYearly ? 'text-[#CCD6F6]' : 'text-[#8892B0]'}`}>Yearly</span>
-            <Chip color="primary" variant="flat" size="sm" className="bg-[#64FFDA]/10 text-[#64FFDA] border border-[#64FFDA]/20">
-              Save 20%
-            </Chip>
-          </div>
+          )}
         </div>
       </section>
 
       {/* Pricing Cards */}
-      <section className="px-6 pb-24 max-w-7xl mx-auto w-full">
-        {isLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <Spinner size="lg" color="primary" />
-          </div>
-        ) : (
+      <section className="px-4 md:px-6 pb-24">
+        <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {plans.map((plan) => (
-              <Card 
-                key={plan.id} 
-                className={`bg-[#112240] border ${plan.isPopular ? 'border-[#64FFDA] shadow-[0_0_30px_rgba(100,255,218,0.1)]' : 'border-[#233554]'} relative overflow-visible flex flex-col h-full`}
-              >
-                {plan.isPopular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Chip color="primary" className="bg-[#64FFDA] text-[#0A192F] font-bold shadow-lg">
-                      Most Popular
-                    </Chip>
-                  </div>
-                )}
-                <CardHeader className="flex flex-col items-start px-8 pt-8 pb-0">
-                  <p className="text-sm font-semibold text-[#64FFDA] uppercase tracking-wider mb-2">{plan.type}</p>
-                  <h3 className="text-2xl font-bold text-[#CCD6F6] mb-2">{plan.name}</h3>
-                  <p className="text-[#8892B0] text-sm h-10">{plan.description}</p>
-                </CardHeader>
-                <CardBody className="px-8 py-6 flex-grow">
-                  <div className="flex items-baseline gap-1 mb-2">
-                    <span className="text-5xl font-bold text-[#CCD6F6]">
-                      {formatCurrency(isYearly ? plan.priceYearly / 12 : plan.priceMonthly)}
-                    </span>
-                    <span className="text-[#8892B0]">/mo</span>
-                  </div>
-                  {isYearly && (
-                    <p className="text-[#64FFDA] text-sm mb-4 font-medium">
-                      Billed {formatCurrency(plan.priceYearly)} yearly
-                    </p>
-                  )}
-                  {!isYearly && <div className="h-5 mb-4" /> /* Spacer to keep cards aligned */}
-                  
-                  <Divider className="bg-[#233554] mb-6" />
-                  
-                  <ul className="space-y-4">
-                    <li className="flex items-center gap-3 text-[#CCD6F6]">
-                      <svg className="w-5 h-5 text-[#64FFDA] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="font-medium">{plan.specs?.cpu} CPU</span>
-                    </li>
-                    <li className="flex items-center gap-3 text-[#CCD6F6]">
-                      <svg className="w-5 h-5 text-[#64FFDA] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="font-medium">{plan.specs?.ram} RAM</span>
-                    </li>
-                    {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-center gap-3 text-[#CCD6F6]">
-                        <svg className="w-5 h-5 text-[#64FFDA] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span className="text-sm">{feature}</span>
-                      </li>
+            {isLoading ? (
+              // Loading Skeletons
+              Array.from({ length: 3 }).map((_, i) => (
+                <Card key={i} className="flex flex-col h-full">
+                  <CardHeader className="space-y-4">
+                    <Skeleton className="h-6 w-1/2" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-10 w-1/3 mt-4" />
+                  </CardHeader>
+                  <CardContent className="flex-1 space-y-4">
+                    {Array.from({ length: 5 }).map((_, j) => (
+                      <div key={j} className="flex items-center gap-2">
+                        <Skeleton className="h-4 w-4 rounded-full" />
+                        <Skeleton className="h-4 w-3/4" />
+                      </div>
                     ))}
-                  </ul>
-                </CardBody>
-                <CardFooter className="px-8 pb-8 pt-0 mt-auto">
-                  <Button 
-                    className={`w-full font-semibold ${plan.isPopular ? 'bg-[#64FFDA] text-[#0A192F]' : 'bg-[#233554] text-[#CCD6F6] hover:bg-[#2a4066]'}`}
-                    size="lg"
-                    onPress={() => onNavigate('/register')}
+                  </CardContent>
+                  <CardFooter>
+                    <Skeleton className="h-10 w-full" />
+                  </CardFooter>
+                </Card>
+              ))
+            ) : (
+              // Actual Pricing Cards
+              plans.map((plan) => {
+                const price = isAnnual ? plan.annualPrice / 12 : plan.monthlyPrice;
+                
+                return (
+                  <Card 
+                    key={plan.id} 
+                    className={cn(
+                      "flex flex-col h-full relative transition-all duration-200",
+                      plan.highlighted 
+                        ? "border-primary shadow-lg md:-translate-y-2 ring-1 ring-primary/20" 
+                        : "hover:border-border/80"
+                    )}
                   >
-                    Deploy Now
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+                    {plan.highlighted && plan.badge && (
+                      <div className="absolute -top-3 left-0 right-0 flex justify-center">
+                        <Badge className="bg-primary text-primary-foreground px-3 py-1 text-xs uppercase tracking-wider font-bold shadow-sm">
+                          {plan.badge}
+                        </Badge>
+                      </div>
+                    )}
+                    
+                    <CardHeader>
+                      <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                      <CardDescription className="min-h-[40px]">{plan.description}</CardDescription>
+                      <div className="mt-6 flex items-baseline text-5xl font-extrabold">
+                        {formatCurrency(price)}
+                        <span className="ml-1 text-xl font-medium text-muted-foreground">/mo</span>
+                      </div>
+                      {isAnnual ? (
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Billed {formatCurrency(plan.annualPrice)} yearly
+                        </p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Billed monthly
+                        </p>
+                      )}
+                    </CardHeader>
+                    
+                    <CardContent className="flex-1">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                          <Server className="h-4 w-4 text-primary" />
+                          <span>Included Resources:</span>
+                        </div>
+                        <ul className="space-y-3">
+                          {plan.features.map((feature, i) => (
+                            <li key={i} className="flex items-start gap-3">
+                              <Check className="h-5 w-5 text-primary shrink-0" />
+                              <span className="text-sm text-muted-foreground">{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </CardContent>
+                    
+                    <CardFooter>
+                      <Button 
+                        className="w-full h-12 text-base" 
+                        variant={plan.highlighted ? "default" : "outline"}
+                        onClick={() => onNavigate('/dashboard')}
+                      >
+                        {plan.ctaText}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })
+            )}
           </div>
-        )}
+        </div>
       </section>
 
       {/* Detailed Comparison Table */}
-      {!isLoading && plans.length > 0 && (
-        <section className="py-24 bg-[#112240]/30 border-y border-[#233554]">
-          <div className="max-w-5xl mx-auto px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-[#CCD6F6] mb-4">Compare Features</h2>
-              <p className="text-[#8892B0]">A detailed breakdown of what's included in each plan.</p>
-            </div>
-
-            <Table 
-              aria-label="Detailed feature comparison table"
-              classNames={{
-                base: "max-w-full overflow-x-auto",
-                table: "min-w-full",
-                wrapper: "bg-[#112240] border border-[#233554] p-0 rounded-xl overflow-hidden shadow-none",
-                th: "bg-[#0A192F] text-[#CCD6F6] font-semibold text-sm py-4 px-6 border-b border-[#233554]",
-                td: "py-4 px-6 border-b border-[#233554]/50 text-[#8892B0]",
-              }}
-            >
-              <TableHeader>
-                <TableColumn className="w-1/4">Overview</TableColumn>
-                {plans.map(plan => (
-                  <TableColumn key={plan.id} className="text-center w-1/4">
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-lg text-[#CCD6F6]">{plan.name}</span>
-                      <span className="text-xs text-[#64FFDA] font-normal">{plan.type}</span>
-                    </div>
-                  </TableColumn>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {/* Hardware Specs */}
-                <TableRow key="header-hardware" className="bg-[#0A192F]/50">
-                  <TableCell className="font-semibold text-[#CCD6F6]">Hardware</TableCell>
-                  {plans.map(plan => <TableCell key={`hw-${plan.id}`} />)}
-                </TableRow>
-                <TableRow key="cpu">
-                  <TableCell>CPU Cores</TableCell>
-                  {plans.map(plan => <TableCell key={`cpu-${plan.id}`} className="text-center font-medium text-[#CCD6F6]">{plan.specs?.cpu || '-'}</TableCell>)}
-                </TableRow>
-                <TableRow key="ram">
-                  <TableCell>Memory (RAM)</TableCell>
-                  {plans.map(plan => <TableCell key={`ram-${plan.id}`} className="text-center font-medium text-[#CCD6F6]">{plan.specs?.ram || '-'}</TableCell>)}
-                </TableRow>
-                <TableRow key="storage">
-                  <TableCell>NVMe Storage</TableCell>
-                  {plans.map(plan => <TableCell key={`storage-${plan.id}`} className="text-center font-medium text-[#CCD6F6]">{plan.specs?.storage || '-'}</TableCell>)}
-                </TableRow>
-                <TableRow key="bandwidth">
-                  <TableCell>Bandwidth</TableCell>
-                  {plans.map(plan => <TableCell key={`bw-${plan.id}`} className="text-center font-medium text-[#CCD6F6]">{plan.specs?.bandwidth || '-'}</TableCell>)}
-                </TableRow>
-
-                {/* Features */}
-                <TableRow key="header-features" className="bg-[#0A192F]/50">
-                  <TableCell className="font-semibold text-[#CCD6F6]">Features</TableCell>
-                  {plans.map(plan => <TableCell key={`feat-${plan.id}`} />)}
-                </TableRow>
-                <TableRow key="ssl">
-                  <TableCell>Free SSL Certificate</TableCell>
-                  {plans.map(plan => <TableCell key={`ssl-${plan.id}`} className="text-center">{renderFeatureCell(plan, 'SSL')}</TableCell>)}
-                </TableRow>
-                <TableRow key="ip">
-                  <TableCell>Dedicated IP</TableCell>
-                  {plans.map(plan => <TableCell key={`ip-${plan.id}`} className="text-center">{renderFeatureCell(plan, 'Dedicated IP')}</TableCell>)}
-                </TableRow>
-                <TableRow key="root">
-                  <TableCell>Root Access</TableCell>
-                  {plans.map(plan => <TableCell key={`root-${plan.id}`} className="text-center">{renderFeatureCell(plan, 'Root Access') || renderFeatureCell(plan, 'Full Server Control')}</TableCell>)}
-                </TableRow>
-                <TableRow key="ddos">
-                  <TableCell>DDoS Protection</TableCell>
-                  {plans.map(plan => <TableCell key={`ddos-${plan.id}`} className="text-center">
-                    <svg className="w-5 h-5 text-[#64FFDA] mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </TableCell>)}
-                </TableRow>
-                <TableRow key="backups">
-                  <TableCell>Automated Backups</TableCell>
-                  {plans.map(plan => (
-                    <TableCell key={`backup-${plan.id}`} className="text-center text-[#CCD6F6]">
-                      {plan.features.find(f => f.toLowerCase().includes('backup')) || 'Add-on'}
-                    </TableCell>
-                  ))}
-                </TableRow>
-                
-                {/* Support */}
-                <TableRow key="header-support" className="bg-[#0A192F]/50">
-                  <TableCell className="font-semibold text-[#CCD6F6]">Support</TableCell>
-                  {plans.map(plan => <TableCell key={`sup-${plan.id}`} />)}
-                </TableRow>
-                <TableRow key="sla">
-                  <TableCell>Uptime SLA</TableCell>
-                  {plans.map(plan => <TableCell key={`sla-${plan.id}`} className="text-center text-[#CCD6F6]">99.99%</TableCell>)}
-                </TableRow>
-                <TableRow key="support-tier">
-                  <TableCell>Support Tier</TableCell>
-                  {plans.map(plan => (
-                    <TableCell key={`suptier-${plan.id}`} className="text-center text-[#CCD6F6]">
-                      {plan.type === 'Dedicated' ? 'Priority 24/7' : 'Standard 24/7'}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableBody>
-            </Table>
+      <section className="py-24 bg-secondary/30 border-y border-border px-4 md:px-6">
+        <div className="container mx-auto max-w-5xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold tracking-tight mb-4">Compare Features</h2>
+            <p className="text-muted-foreground text-lg">
+              A detailed breakdown of what's included in each tier.
+            </p>
           </div>
-        </section>
-      )}
 
-      {/* FAQ Section */}
-      <section className="py-24 max-w-3xl mx-auto px-6 w-full">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-[#CCD6F6] mb-4">Frequently Asked Questions</h2>
-          <p className="text-[#8892B0]">Everything you need to know about our hosting plans.</p>
+          <Table className="bg-background">
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="w-[30%] text-base font-semibold text-foreground">Features</TableHead>
+                <TableHead className="w-[23%] text-center text-base font-semibold text-foreground">Starter</TableHead>
+                <TableHead className="w-[23%] text-center text-base font-semibold text-primary">Pro</TableHead>
+                <TableHead className="w-[23%] text-center text-base font-semibold text-foreground">Enterprise</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {COMPARISON_FEATURES.map((category, idx) => (
+                <React.Fragment key={idx}>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableCell colSpan={4} className="font-semibold text-foreground py-3">
+                      {category.category}
+                    </TableCell>
+                  </TableRow>
+                  {category.features.map((feature, fIdx) => (
+                    <TableRow key={fIdx}>
+                      <TableCell className="font-medium text-muted-foreground">
+                        {feature.name}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {typeof feature.starter === 'boolean' ? (
+                          feature.starter ? <Check className="h-5 w-5 text-primary mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground/50 mx-auto" />
+                        ) : (
+                          <span className="text-sm">{feature.starter}</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center bg-primary/5">
+                        {typeof feature.pro === 'boolean' ? (
+                          feature.pro ? <Check className="h-5 w-5 text-primary mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground/50 mx-auto" />
+                        ) : (
+                          <span className="text-sm font-medium text-foreground">{feature.pro}</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {typeof feature.enterprise === 'boolean' ? (
+                          feature.enterprise ? <Check className="h-5 w-5 text-primary mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground/50 mx-auto" />
+                        ) : (
+                          <span className="text-sm">{feature.enterprise}</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </React.Fragment>
+              ))}
+            </TableBody>
+          </Table>
         </div>
-
-        <Accordion variant="splitted" className="gap-4">
-          {faqs.map((faq, index) => (
-            <AccordionItem 
-              key={index} 
-              aria-label={faq.question} 
-              title={<span className="text-[#CCD6F6] font-medium">{faq.question}</span>}
-              className="bg-[#112240] border border-[#233554] shadow-none"
-            >
-              <p className="text-[#8892B0] pb-4 leading-relaxed">
-                {faq.answer}
-              </p>
-            </AccordionItem>
-          ))}
-        </Accordion>
       </section>
 
-      {/* Bottom CTA */}
-      <section className="py-20 text-center px-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-[#CCD6F6] mb-6">Still have questions?</h2>
-        <p className="text-[#8892B0] mb-8 max-w-xl mx-auto">
-          Our cloud experts are available 24/7 to help you choose the perfect infrastructure for your specific needs.
-        </p>
-        <Button 
-          variant="bordered" 
-          size="lg" 
-          className="border-[#64FFDA] text-[#64FFDA] hover:bg-[#64FFDA]/10 font-medium"
-          onPress={() => onNavigate('/contact')}
-        >
-          Contact Sales
-        </Button>
+      {/* FAQ Section */}
+      <section className="py-24 px-4 md:px-6 bg-background">
+        <div className="container mx-auto max-w-3xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold tracking-tight mb-4">Frequently Asked Questions</h2>
+            <p className="text-muted-foreground text-lg">
+              Everything you need to know about the product and billing.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {FAQS.map((faq, index) => (
+              <div 
+                key={index} 
+                className="border border-border rounded-lg overflow-hidden transition-colors hover:border-border/80"
+              >
+                <button
+                  className="flex items-center justify-between w-full p-5 text-left bg-card hover:bg-muted/30 transition-colors focus:outline-none"
+                  onClick={() => toggleFaq(index)}
+                  aria-expanded={openFaqIndex === index}
+                >
+                  <span className="font-medium text-foreground pr-8">{faq.question}</span>
+                  <ChevronDown 
+                    className={cn(
+                      "h-5 w-5 text-muted-foreground transition-transform duration-200 shrink-0",
+                      openFaqIndex === index ? "rotate-180" : ""
+                    )} 
+                  />
+                </button>
+                <div 
+                  className={cn(
+                    "overflow-hidden transition-all duration-200 ease-in-out",
+                    openFaqIndex === index ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                  )}
+                >
+                  <div className="p-5 pt-0 text-muted-foreground text-sm leading-relaxed bg-card border-t border-border/50">
+                    {faq.answer}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center p-8 bg-muted/50 rounded-xl border border-border">
+            <HelpCircle className="h-10 w-10 text-primary mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Still have questions?</h3>
+            <p className="text-muted-foreground mb-6">
+              Can't find the answer you're looking for? Please chat to our friendly team.
+            </p>
+            <Button variant="outline" onClick={() => onNavigate('/support')}>
+              Contact Support
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4 md:px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6">
+            Start building your infrastructure today
+          </h2>
+          <p className="text-primary-foreground/80 text-lg max-w-2xl mx-auto mb-10">
+            Join thousands of developers and businesses who trust NexusHost for their critical applications.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button 
+              size="lg" 
+              variant="secondary" 
+              className="w-full sm:w-auto h-12 px-8 text-base font-semibold text-primary hover:bg-white"
+              onClick={() => onNavigate('/dashboard')}
+            >
+              Get Started Now
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </section>
     </div>
   );

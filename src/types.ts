@@ -2,94 +2,81 @@ export interface SiteConfig {
   name: string;
   description: string;
   url: string;
+  ogImage: string;
   links: {
-    twitter?: string;
-    github?: string;
-    support?: string;
+    twitter: string;
+    github: string;
+    discord: string;
   };
 }
 
 export interface NavItem {
-  label: string;
+  title: string;
   href: string;
-  isExternal?: boolean;
-  requiresAuth?: boolean;
+  disabled?: boolean;
+  external?: boolean;
 }
-
-export type PlanType = 'Shared' | 'VPS' | 'Dedicated';
 
 export interface HostingPlan {
-  _id?: string;
   id: string;
   name: string;
-  type: PlanType;
-  priceMonthly: number;
-  priceYearly: number;
   description: string;
+  monthlyPrice: number;
+  annualPrice: number;
   features: string[];
-  specs: {
-    cpu: string;
-    ram: string;
-    storage: string;
-    bandwidth: string;
-  };
-  isPopular?: boolean;
+  highlighted?: boolean;
+  ctaText: string;
+  badge?: string;
 }
 
-export interface ActiveService {
+export type ServerStatus = 'running' | 'stopped' | 'starting' | 'error' | 'maintenance';
+
+export interface ServerInstance {
   id: string;
+  name: string;
+  status: ServerStatus;
+  ipAddress: string;
+  region: string;
   planId: string;
-  planName: string;
-  status: 'Active' | 'Suspended' | 'Pending' | 'Cancelled';
-  ipAddress?: string;
-  domain?: string;
-  billingCycle: 'Monthly' | 'Yearly';
-  nextBillingDate: string;
-  createdAt: string;
+  uptime: number; // Represented as a percentage (e.g., 99.99)
+  cpuUsage: number; // Represented as a percentage (0-100)
+  ramUsage: number; // Represented as a percentage (0-100)
+  diskUsage: number; // Represented as a percentage (0-100)
+  createdAt: string; // ISO 8601 date string
 }
 
-export interface User {
-  _id?: string;
+export interface UserSession {
   id: string;
   name: string;
   email: string;
   avatarUrl?: string;
-  role: 'Customer' | 'Admin';
-  joinedAt: string;
-  activeServices: ActiveService[];
+  role: 'user' | 'admin';
 }
 
-export type TicketStatus = 'Open' | 'In Progress' | 'Resolved' | 'Closed';
-export type TicketPriority = 'Low' | 'Medium' | 'High' | 'Critical';
+export type DomainStatus = 'active' | 'expired' | 'pending' | 'transferring';
 
-export interface TicketMessage {
+export interface Domain {
   id: string;
-  senderId: string;
-  senderName: string;
-  isAdmin: boolean;
-  content: string;
-  createdAt: string;
+  name: string;
+  status: DomainStatus;
+  autoRenew: boolean;
+  expiresAt: string; // ISO 8601 date string
 }
 
-export interface Ticket {
-  _id?: string;
+export type TicketStatus = 'open' | 'closed' | 'pending_user' | 'investigating';
+export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
+
+export interface SupportTicket {
   id: string;
-  userId: string;
   subject: string;
   status: TicketStatus;
   priority: TicketPriority;
-  relatedServiceId?: string;
-  createdAt: string;
-  updatedAt: string;
-  messages: TicketMessage[];
+  createdAt: string; // ISO 8601 date string
+  updatedAt: string; // ISO 8601 date string
 }
 
-export interface DatabaseResponse<T> {
-  documents?: T[];
-  document?: T;
-  insertedId?: string;
-  matchedCount?: number;
-  modifiedCount?: number;
-  deletedCount?: number;
-  error?: string;
+export interface FeatureItem {
+  title: string;
+  description: string;
+  iconName: string;
 }

@@ -1,434 +1,584 @@
-import React, { useEffect, useState } from 'react';
+x
+import React, { useState, useEffect } from 'react';
 import { 
-  Button, 
-  Card, 
-  CardHeader, 
-  CardBody, 
-  Chip, 
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Tabs,
-  Tab,
-  Progress,
-  Spinner,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem
-} from '@heroui/react';
-import { ActiveService, User } from '../types';
-import { getUserServices, IS_DB_CONNECTED } from '../db';
-import { formatDate, getStatusColor } from '../utils';
+  Server, 
+  Globe, 
+  LifeBuoy, 
+  CreditCard, 
+  Database, 
+  Play, 
+  Square, 
+  RefreshCw, 
+  Settings,
+  Plus,
+  Activity,
+  ExternalLink
+} from 'lucide-react';
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import { 
+  cn, 
+  formatCurrency, 
+  formatDate, 
+  getServerStatusColor, 
+  getDomainStatusColor, 
+  getTicketStatusColor, 
+  getTicketPriorityColor 
+} from '../utils';
+import type { ServerInstance, Domain, SupportTicket } from '../types';
+import { 
+  IS_DB_CONNECTED, 
+  getServerInstances, 
+  getDomains, 
+  getSupportTickets 
+} from '../db';
+import { Button } from './header';
+
+// ============================================================================
+// SYNTHESIZED SHADCN/UI COMPONENTS
+// ============================================================================
+
+const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("rounded-xl border bg-card text-card-foreground shadow-sm", className)} {...props} />
+  )
+);
+Card.displayName = "Card";
+
+const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />
+  )
+);
+CardHeader.displayName = "CardHeader";
+
+const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+  ({ className, ...props }, ref) => (
+    <h3 ref={ref} className={cn("font-semibold leading-none tracking-tight", className)} {...props} />
+  )
+);
+CardTitle.displayName = "CardTitle";
+
+const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  )
+);
+CardContent.displayName = "CardContent";
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default: "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
+        secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive: "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return <div className={cn(badgeVariants({ variant }), className)} {...props} />;
+}
+
+const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(({ className, ...props }, ref) => (
+  <div className="relative w-full overflow-auto rounded-md border border-border">
+    <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
+  </div>
+));
+Table.displayName = "Table";
+
+const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(({ className, ...props }, ref) => (
+  <thead ref={ref} className={cn("[&_tr]:border-b bg-muted/50", className)} {...props} />
+));
+TableHeader.displayName = "TableHeader";
+
+const TableBody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(({ className, ...props }, ref) => (
+  <tbody ref={ref} className={cn("[&_tr:last-child]:border-0", className)} {...props} />
+));
+TableBody.displayName = "TableBody";
+
+const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(({ className, ...props }, ref) => (
+  <tr ref={ref} className={cn("border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", className)} {...props} />
+));
+TableRow.displayName = "TableRow";
+
+const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(({ className, ...props }, ref) => (
+  <th ref={ref} className={cn("h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0", className)} {...props} />
+));
+TableHead.displayName = "TableHead";
+
+const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(({ className, ...props }, ref) => (
+  <td ref={ref} className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)} {...props} />
+));
+TableCell.displayName = "TableCell";
+
+function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("animate-pulse rounded-md bg-muted", className)} {...props} />;
+}
+
+// --- Tabs Implementation ---
+const TabsContext = React.createContext<{ value: string; onValueChange: (value: string) => void } | null>(null);
+
+function useTabs() {
+  const context = React.useContext(TabsContext);
+  if (!context) throw new Error("Tabs components must be used within a Tabs provider");
+  return context;
+}
+
+const Tabs = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { value?: string; defaultValue?: string; onValueChange?: (value: string) => void }>(
+  ({ className, value, defaultValue, onValueChange, ...props }, ref) => {
+    const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue || "");
+    const isControlled = value !== undefined;
+    const currentValue = isControlled ? value : uncontrolledValue;
+    
+    const handleValueChange = React.useCallback((newValue: string) => {
+      if (!isControlled) setUncontrolledValue(newValue);
+      onValueChange?.(newValue);
+    }, [isControlled, onValueChange]);
+
+    return (
+      <TabsContext.Provider value={{ value: currentValue, onValueChange: handleValueChange }}>
+        <div ref={ref} className={cn("w-full", className)} {...props} />
+      </TabsContext.Provider>
+    );
+  }
+);
+Tabs.displayName = "Tabs";
+
+const TabsList = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground", className)} {...props} />
+  )
+);
+TabsList.displayName = "TabsList";
+
+const TabsTrigger = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement> & { value: string }>(
+  ({ className, value, ...props }, ref) => {
+    const { value: selectedValue, onValueChange } = useTabs();
+    const isSelected = selectedValue === value;
+    return (
+      <button
+        ref={ref}
+        type="button"
+        role="tab"
+        aria-selected={isSelected}
+        data-state={isSelected ? "active" : "inactive"}
+        onClick={() => onValueChange(value)}
+        className={cn(
+          "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+);
+TabsTrigger.displayName = "TabsTrigger";
+
+const TabsContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { value: string }>(
+  ({ className, value, ...props }, ref) => {
+    const { value: selectedValue } = useTabs();
+    if (selectedValue !== value) return null;
+    return (
+      <div
+        ref={ref}
+        role="tabpanel"
+        data-state={selectedValue === value ? "active" : "inactive"}
+        className={cn("mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className)}
+        {...props}
+      />
+    );
+  }
+);
+TabsContent.displayName = "TabsContent";
+
+// ============================================================================
+// PAGE COMPONENT
+// ============================================================================
 
 export interface DashboardPageProps {
   onNavigate: (path: string) => void;
 }
 
-// Static fallback data to keep the UI functional when the database is not connected
-const fallbackServices: ActiveService[] = [
-  {
-    id: 'srv_1',
-    userId: 'user_1',
-    planId: 'plan_vps_1',
-    name: 'prod-web-01',
-    type: 'VPS',
-    status: 'Active',
-    ipAddress: '198.51.100.24',
-    region: 'New York (US-East)',
-    nextBillingDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days from now
-    autoRenew: true,
-    usage: { cpu: 45, ram: 62, storage: 28 }
-  },
-  {
-    id: 'srv_2',
-    userId: 'user_1',
-    planId: 'plan_shared_1',
-    name: 'dev-blog-staging',
-    type: 'Shared',
-    status: 'Active',
-    ipAddress: '198.51.100.89',
-    region: 'London (UK-South)',
-    nextBillingDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
-    autoRenew: true,
-    usage: { cpu: 12, ram: 35, storage: 85 }
-  },
-  {
-    id: 'srv_3',
-    userId: 'user_1',
-    planId: 'plan_dedi_1',
-    name: 'db-cluster-main',
-    type: 'Dedicated',
-    status: 'Provisioning',
-    region: 'Frankfurt (EU-Central)',
-    nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    autoRenew: true,
-    usage: { cpu: 0, ram: 0, storage: 0 }
-  },
-  {
-    id: 'srv_4',
-    userId: 'user_1',
-    planId: 'plan_vps_2',
-    name: 'legacy-app-server',
-    type: 'VPS',
-    status: 'Suspended',
-    ipAddress: '203.0.113.42',
-    region: 'Singapore (AP-Southeast)',
-    nextBillingDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // Past due
-    autoRenew: false,
-    usage: { cpu: 0, ram: 0, storage: 45 }
-  }
-];
-
-export function DashboardPage({ onNavigate }: DashboardPageProps): JSX.Element {
-  const [services, setServices] = useState<ActiveService[]>([]);
+export function DashboardPage({ onNavigate }: DashboardPageProps) {
+  const [servers, setServers] = useState<ServerInstance[]>([]);
+  const [domains, setDomains] = useState<Domain[]>([]);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState<string>("services");
-
-  // Mock user for the dashboard header
-  const mockUser: User = {
-    id: 'user_1',
-    email: 'admin@example.com',
-    name: 'Alex Developer',
-    role: 'client',
-    createdAt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString()
-  };
 
   useEffect(() => {
+    let isMounted = true;
+    
     async function loadDashboardData() {
-      setIsLoading(true);
-      if (IS_DB_CONNECTED) {
-        try {
-          // In a real app, we'd get the current user ID from auth context
-          const response = await getUserServices(mockUser.id);
-          if (response.documents && response.documents.length > 0) {
-            setServices(response.documents);
-          } else {
-            setServices(fallbackServices);
-          }
-        } catch (error) {
-          console.error("Failed to load services:", error);
-          setServices(fallbackServices);
+      try {
+        setIsLoading(true);
+        const [serversData, domainsData, ticketsData] = await Promise.all([
+          getServerInstances(),
+          getDomains(),
+          getSupportTickets()
+        ]);
+        
+        if (isMounted) {
+          setServers(serversData);
+          setDomains(domainsData);
+          setTickets(ticketsData);
         }
-      } else {
-        // Use static fallback data if DB is not connected
-        setServices(fallbackServices);
+      } catch (error) {
+        console.error("Failed to load dashboard data", error);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
-      setIsLoading(false);
     }
 
     loadDashboardData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const activeCount = services.filter(s => s.status === 'Active').length;
-  const pendingCount = services.filter(s => s.status === 'Provisioning' || s.status === 'Pending').length;
-
-  const renderUsageBar = (value: number, label: string) => {
-    const color = value > 80 ? "danger" : value > 60 ? "warning" : "success";
-    return (
-      <div className="w-full max-w-[120px]">
-        <div className="flex justify-between text-xs mb-1">
-          <span className="text-[#8892B0]">{label}</span>
-          <span className="text-[#CCD6F6]">{value}%</span>
-        </div>
-        <Progress 
-          value={value} 
-          color={color} 
-          size="sm" 
-          classNames={{
-            track: "bg-[#233554]",
-            indicator: value > 80 ? "bg-[#FF6B6B]" : value > 60 ? "bg-[#f1c40f]" : "bg-[#64FFDA]"
-          }}
-        />
-      </div>
-    );
-  };
+  // Mock calculation for billing based on active resources
+  const currentBilling = servers.length * 24.00 + domains.length * 1.20;
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-[#0A192F] pt-24 pb-12">
-      <div className="max-w-7xl mx-auto px-6 w-full">
+    <div className="flex flex-col min-h-screen bg-background">
+      <main className="flex-1 container mx-auto px-4 md:px-6 py-8 md:py-12 max-w-7xl">
         
-        {/* Dashboard Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#CCD6F6] mb-2">Welcome back, {mockUser.name.split(' ')[0]}</h1>
-            <p className="text-[#8892B0]">Manage your infrastructure and monitor performance.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
+            <p className="text-muted-foreground mt-1">Manage your infrastructure, domains, and account settings.</p>
           </div>
-          <div className="flex gap-3">
-            <Button 
-              variant="bordered" 
-              className="border-[#233554] text-[#CCD6F6] hover:bg-[#112240]"
-              onPress={() => onNavigate('/support')}
-            >
-              Support Tickets
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => onNavigate('/support')}>
+              <LifeBuoy className="mr-2 h-4 w-4" />
+              Support
             </Button>
-            <Button 
-              color="primary" 
-              className="bg-[#64FFDA] text-[#0A192F] font-semibold"
-              onPress={() => onNavigate('/pricing')}
-              startContent={
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-              }
-            >
-              Deploy New Service
+            <Button onClick={() => onNavigate('/pricing')}>
+              <Plus className="mr-2 h-4 w-4" />
+              New Resource
             </Button>
           </div>
         </div>
 
-        {/* Database Connection Warning */}
+        {/* DB Warning */}
         {!IS_DB_CONNECTED && (
-          <Card className="bg-[#233554]/50 border border-[#f1c40f]/30 mb-8 shadow-none">
-            <CardBody className="flex flex-row items-center gap-4 p-4">
-              <div className="w-10 h-10 rounded-full bg-[#f1c40f]/10 flex items-center justify-center shrink-0">
-                <svg className="w-6 h-6 text-[#f1c40f]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="flex-grow">
-                <h4 className="text-[#CCD6F6] font-semibold text-sm mb-1">Preview Mode Active</h4>
-                <p className="text-[#8892B0] text-sm">
-                  You are viewing static dashboard data. To enable real-time service management, please connect your MongoDB integration.
-                </p>
-              </div>
-              <Button 
-                size="sm" 
-                variant="flat" 
-                className="bg-[#f1c40f]/20 text-[#f1c40f] font-medium shrink-0"
-              >
-                Connect Database
-              </Button>
-            </CardBody>
-          </Card>
+          <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-700 dark:text-yellow-400 p-4 rounded-lg flex items-start gap-3 mb-8">
+            <Database className="h-5 w-5 shrink-0 mt-0.5" />
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-semibold">Database Integration Not Connected</p>
+              <p className="text-sm opacity-90">
+                You are viewing placeholder data. To manage real servers and domains, connect a database from the Integrations tab.
+              </p>
+            </div>
+          </div>
         )}
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-[#112240] border border-[#233554] shadow-none">
-            <CardBody className="p-6 flex flex-row items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-[#64FFDA]/10 flex items-center justify-center text-[#64FFDA]">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
-                </svg>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Instances</CardTitle>
+              <Server className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isLoading ? <Skeleton className="h-8 w-16" /> : servers.filter(s => s.status === 'running').length}
               </div>
-              <div>
-                <p className="text-[#8892B0] text-sm font-medium">Total Services</p>
-                <p className="text-2xl font-bold text-[#CCD6F6]">{services.length}</p>
-              </div>
-            </CardBody>
+              <p className="text-xs text-muted-foreground mt-1">
+                Out of {isLoading ? '-' : servers.length} total servers
+              </p>
+            </CardContent>
           </Card>
           
-          <Card className="bg-[#112240] border border-[#233554] shadow-none">
-            <CardBody className="p-6 flex flex-row items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-[#2ecc71]/10 flex items-center justify-center text-[#2ecc71]">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Domains</CardTitle>
+              <Globe className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isLoading ? <Skeleton className="h-8 w-16" /> : domains.filter(d => d.status === 'active').length}
               </div>
-              <div>
-                <p className="text-[#8892B0] text-sm font-medium">Active Instances</p>
-                <p className="text-2xl font-bold text-[#CCD6F6]">{activeCount}</p>
-              </div>
-            </CardBody>
+              <p className="text-xs text-muted-foreground mt-1">
+                {isLoading ? '-' : domains.filter(d => d.autoRenew).length} set to auto-renew
+              </p>
+            </CardContent>
           </Card>
 
-          <Card className="bg-[#112240] border border-[#233554] shadow-none">
-            <CardBody className="p-6 flex flex-row items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-[#f1c40f]/10 flex items-center justify-center text-[#f1c40f]">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Open Tickets</CardTitle>
+              <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isLoading ? <Skeleton className="h-8 w-16" /> : tickets.filter(t => t.status !== 'closed').length}
               </div>
-              <div>
-                <p className="text-[#8892B0] text-sm font-medium">Provisioning</p>
-                <p className="text-2xl font-bold text-[#CCD6F6]">{pendingCount}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {isLoading ? '-' : tickets.filter(t => t.status === 'pending_user').length} awaiting your reply
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Current Usage</CardTitle>
+              <CreditCard className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isLoading ? <Skeleton className="h-8 w-24" /> : formatCurrency(currentBilling)}
               </div>
-            </CardBody>
+              <p className="text-xs text-muted-foreground mt-1">
+                Estimated for this billing cycle
+              </p>
+            </CardContent>
           </Card>
         </div>
 
-        {/* Main Content Area */}
-        <Card className="bg-[#112240] border border-[#233554] shadow-none overflow-hidden">
-          <CardHeader className="px-6 pt-6 pb-0 border-b border-[#233554]">
-            <Tabs 
-              selectedKey={selectedTab} 
-              onSelectionChange={(key) => setSelectedTab(key as string)}
-              variant="underlined"
-              classNames={{
-                tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
-                cursor: "w-full bg-[#64FFDA]",
-                tab: "max-w-fit px-0 h-12",
-                tabContent: "group-data-[selected=true]:text-[#64FFDA] text-[#8892B0]"
-              }}
-            >
-              <Tab key="services" title="Active Services" />
-              <Tab key="billing" title="Billing & Invoices" />
-              <Tab key="settings" title="Account Settings" />
-            </Tabs>
-          </CardHeader>
-          
-          <CardBody className="p-0">
-            {selectedTab === "services" && (
-              <div className="w-full overflow-x-auto">
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="instances" className="w-full">
+          <TabsList className="mb-6 h-12 px-2">
+            <TabsTrigger value="instances" className="h-9 px-4">Compute Instances</TabsTrigger>
+            <TabsTrigger value="domains" className="h-9 px-4">Domains</TabsTrigger>
+            <TabsTrigger value="support" className="h-9 px-4">Support Tickets</TabsTrigger>
+          </TabsList>
+
+          {/* Instances Tab */}
+          <TabsContent value="instances" className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold tracking-tight">Your Servers</h2>
+              <Button variant="outline" size="sm" onClick={() => onNavigate('/pricing')}>
+                Deploy Server
+              </Button>
+            </div>
+            <Table className="bg-card">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>IP Address</TableHead>
+                  <TableHead>Region</TableHead>
+                  <TableHead>Plan</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {isLoading ? (
-                  <div className="flex justify-center items-center py-20">
-                    <Spinner size="lg" color="primary" />
-                  </div>
-                ) : services.length === 0 ? (
-                  <div className="text-center py-20 px-6">
-                    <div className="w-16 h-16 mx-auto bg-[#233554] rounded-full flex items-center justify-center mb-4">
-                      <svg className="w-8 h-8 text-[#8892B0]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                      </svg>
-                    </div>
-                    <h3 className="text-xl font-semibold text-[#CCD6F6] mb-2">No active services</h3>
-                    <p className="text-[#8892B0] mb-6 max-w-md mx-auto">
-                      You don't have any active hosting plans yet. Deploy your first server to get started.
-                    </p>
-                    <Button 
-                      color="primary" 
-                      className="bg-[#64FFDA] text-[#0A192F] font-semibold"
-                      onPress={() => onNavigate('/pricing')}
-                    >
-                      View Hosting Plans
-                    </Button>
-                  </div>
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-28" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell className="text-right"><Skeleton className="h-8 w-28 ml-auto" /></TableCell>
+                    </TableRow>
+                  ))
+                ) : servers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                      No instances found. Deploy your first server to get started.
+                    </TableCell>
+                  </TableRow>
                 ) : (
-                  <Table 
-                    aria-label="Active services table"
-                    classNames={{
-                      base: "min-w-full",
-                      table: "min-w-full",
-                      wrapper: "bg-transparent p-0 shadow-none rounded-none",
-                      th: "bg-[#0A192F] text-[#8892B0] font-medium text-xs uppercase tracking-wider py-4 px-6 border-b border-[#233554]",
-                      td: "py-4 px-6 border-b border-[#233554]/50 text-[#CCD6F6]",
-                    }}
-                  >
-                    <TableHeader>
-                      <TableColumn>SERVICE</TableColumn>
-                      <TableColumn>STATUS</TableColumn>
-                      <TableColumn>REGION & IP</TableColumn>
-                      <TableColumn>USAGE</TableColumn>
-                      <TableColumn>NEXT BILLING</TableColumn>
-                      <TableColumn align="end">ACTIONS</TableColumn>
-                    </TableHeader>
-                    <TableBody>
-                      {services.map((service) => (
-                        <TableRow key={service.id} className="hover:bg-[#233554]/30 transition-colors">
-                          <TableCell>
-                            <div className="flex flex-col">
-                              <span className="font-semibold text-[#CCD6F6]">{service.name}</span>
-                              <span className="text-xs text-[#8892B0]">{service.type} Hosting</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Chip 
-                              size="sm" 
-                              color={getStatusColor(service.status)}
-                              variant="flat"
-                              className="capitalize"
-                            >
-                              {service.status}
-                            </Chip>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col">
-                              <span className="text-sm text-[#CCD6F6]">{service.region}</span>
-                              <span className="text-xs text-[#8892B0] font-mono mt-1">
-                                {service.ipAddress || 'Assigning IP...'}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {service.status === 'Active' && service.usage ? (
-                              <div className="flex flex-col gap-2">
-                                {renderUsageBar(service.usage.cpu, 'CPU')}
-                                {renderUsageBar(service.usage.ram, 'RAM')}
-                              </div>
-                            ) : (
-                              <span className="text-sm text-[#8892B0] italic">N/A</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col">
-                              <span className="text-sm text-[#CCD6F6]">{formatDate(service.nextBillingDate)}</span>
-                              <span className="text-xs text-[#8892B0] mt-1">
-                                {service.autoRenew ? 'Auto-renews' : 'Manual renewal'}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex justify-end">
-                              <Dropdown placement="bottom-end">
-                                <DropdownTrigger>
-                                  <Button isIconOnly variant="light" className="text-[#8892B0] hover:text-[#CCD6F6]">
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                                    </svg>
-                                  </Button>
-                                </DropdownTrigger>
-                                <DropdownMenu 
-                                  aria-label="Service actions"
-                                  className="bg-[#112240] border border-[#233554] text-[#CCD6F6]"
-                                >
-                                  <DropdownItem key="manage" className="hover:bg-[#233554]">Manage Service</DropdownItem>
-                                  <DropdownItem key="console" className="hover:bg-[#233554]">Open Console</DropdownItem>
-                                  <DropdownItem key="restart" className="hover:bg-[#233554]">Restart Server</DropdownItem>
-                                  <DropdownItem key="upgrade" className="hover:bg-[#233554] text-[#64FFDA]">Upgrade Plan</DropdownItem>
-                                  <DropdownItem key="cancel" className="text-[#FF6B6B] hover:bg-[#FF6B6B]/10">Cancel Service</DropdownItem>
-                                </DropdownMenu>
-                              </Dropdown>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                  servers.map(server => (
+                    <TableRow key={server.id}>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Server className="h-4 w-4 text-muted-foreground" />
+                          {server.name}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={cn("capitalize", getServerStatusColor(server.status))}>
+                          {server.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-mono text-xs text-muted-foreground">
+                        {server.ipAddress || 'Provisioning...'}
+                      </TableCell>
+                      <TableCell>{server.region}</TableCell>
+                      <TableCell className="capitalize">{server.planId.replace('-', ' ')}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button variant="outline" className="h-8 w-8 p-0" title="Start" disabled={server.status === 'running'}>
+                            <Play className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" className="h-8 w-8 p-0" title="Stop" disabled={server.status === 'stopped'}>
+                            <Square className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" className="h-8 w-8 p-0" title="Restart">
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" className="h-8 w-8 p-0 ml-2" title="Settings">
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
                 )}
-              </div>
-            )}
+              </TableBody>
+            </Table>
+          </TabsContent>
 
-            {selectedTab === "billing" && (
-              <div className="p-8 text-center">
-                <div className="w-16 h-16 mx-auto bg-[#233554] rounded-full flex items-center justify-center mb-4">
-                  <svg className="w-8 h-8 text-[#8892B0]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-[#CCD6F6] mb-2">Billing History</h3>
-                <p className="text-[#8892B0] mb-6 max-w-md mx-auto">
-                  View your past invoices, manage payment methods, and update your billing address.
-                </p>
-                <Button variant="bordered" className="border-[#233554] text-[#CCD6F6]">
-                  Manage Payment Methods
-                </Button>
-              </div>
-            )}
+          {/* Domains Tab */}
+          <TabsContent value="domains" className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold tracking-tight">Your Domains</h2>
+              <Button variant="outline" size="sm">
+                Register Domain
+              </Button>
+            </div>
+            <Table className="bg-card">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Domain Name</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Registered</TableHead>
+                  <TableHead>Expires</TableHead>
+                  <TableHead>Auto-Renew</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  Array.from({ length: 2 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                      <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                    </TableRow>
+                  ))
+                ) : domains.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                      No domains found. Register or transfer a domain.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  domains.map(domain => (
+                    <TableRow key={domain.id}>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Globe className="h-4 w-4 text-muted-foreground" />
+                          {domain.name}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={cn("capitalize", getDomainStatusColor(domain.status))}>
+                          {domain.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{formatDate(domain.registeredAt)}</TableCell>
+                      <TableCell className="text-muted-foreground">{formatDate(domain.expiresAt)}</TableCell>
+                      <TableCell>
+                        {domain.autoRenew ? (
+                          <span className="text-sm text-green-600 dark:text-green-400 font-medium">Enabled</span>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">Disabled</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="outline" className="h-8 text-xs px-3">
+                          Manage DNS
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TabsContent>
 
-            {selectedTab === "settings" && (
-              <div className="p-8 text-center">
-                <div className="w-16 h-16 mx-auto bg-[#233554] rounded-full flex items-center justify-center mb-4">
-                  <svg className="w-8 h-8 text-[#8892B0]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-[#CCD6F6] mb-2">Account Settings</h3>
-                <p className="text-[#8892B0] mb-6 max-w-md mx-auto">
-                  Update your profile, configure security settings like 2FA, and manage API keys.
-                </p>
-                <Button variant="bordered" className="border-[#233554] text-[#CCD6F6]">
-                  Edit Profile
-                </Button>
-              </div>
-            )}
-          </CardBody>
-        </Card>
-      </div>
+          {/* Support Tab */}
+          <TabsContent value="support" className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold tracking-tight">Support Tickets</h2>
+              <Button variant="outline" size="sm" onClick={() => onNavigate('/support')}>
+                Open Ticket
+              </Button>
+            </div>
+            <Table className="bg-card">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">Ticket ID</TableHead>
+                  <TableHead>Subject</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Priority</TableHead>
+                  <TableHead>Last Updated</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-24 rounded-full" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell className="text-right"><Skeleton className="h-8 w-16 ml-auto" /></TableCell>
+                    </TableRow>
+                  ))
+                ) : tickets.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                      No support tickets found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  tickets.map(ticket => (
+                    <TableRow key={ticket.id}>
+                      <TableCell className="font-mono text-xs text-muted-foreground">
+                        #{ticket.id.substring(0, 6)}
+                      </TableCell>
+                      <TableCell className="font-medium">{ticket.subject}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={cn("capitalize", getTicketStatusColor(ticket.status))}>
+                          {ticket.status.replace('_', ' ')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={cn("capitalize", getTicketPriorityColor(ticket.priority))}>
+                          {ticket.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {formatDate(ticket.updatedAt)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="outline" className="h-8 text-xs px-3">
+                          View <ExternalLink className="ml-1.5 h-3 w-3" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TabsContent>
+        </Tabs>
+
+      </main>
     </div>
   );
 }
