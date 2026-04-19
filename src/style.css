@@ -80,7 +80,7 @@
   }
 }
 
-/* Custom utility classes for hosting platform specific UI */
+/* Custom utility classes for UI enhancements */
 @layer utilities {
   .glass-panel {
     @apply bg-background/60 backdrop-blur-md border border-border/50 shadow-sm;
