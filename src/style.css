@@ -4,67 +4,67 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Light Theme: Bakery Day */
+    --background: 40 33% 98%; /* Soft cream #fdfbf7 */
+    --foreground: 24 20% 15%; /* Dark brown #2d241e */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 24 20% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 24 20% 15%;
 
-    /* Cyan Primary for Dark-Tech aesthetic */
-    --primary: 189 94% 43%;
+    --primary: 32 95% 44%; /* Warm cookie brown / amber-600 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 45 93% 88%; /* Lighter tan / amber-100 */
+    --secondary-foreground: 24 20% 15%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 40 20% 94%; /* Soft gray-brown */
+    --muted-foreground: 24 5% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 45 93% 56%; /* Vibrant gold / amber-400 */
+    --accent-foreground: 24 20% 15%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 189 94% 43%;
+    --border: 40 20% 90%;
+    --input: 40 20% 90%;
+    --ring: 32 95% 44%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark Theme: Night Shift Bakery */
+    --background: 24 10% 10%; /* Deep dark brown/charcoal #1c1917 */
+    --foreground: 40 33% 98%; /* Soft cream #fdfbf7 */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 24 10% 12%;
+    --card-foreground: 40 33% 98%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 24 10% 12%;
+    --popover-foreground: 40 33% 98%;
 
-    /* Cyan Primary for Dark-Tech aesthetic */
-    --primary: 189 94% 43%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 38 92% 50%; /* Warm cookie brown / amber-500 */
+    --primary-foreground: 24 20% 15%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 24 7% 15%; /* Darker brown */
+    --secondary-foreground: 40 33% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 24 7% 15%;
+    --muted-foreground: 24 5% 64%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 45 93% 56%; /* Vibrant gold */
+    --accent-foreground: 24 20% 15%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 189 94% 43%;
+    --border: 24 6% 25%;
+    --input: 24 6% 25%;
+    --ring: 38 92% 50%;
   }
 }
 
@@ -73,18 +73,45 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground antialiased selection:bg-primary/30;
+    /* Prevent text selection on the body to avoid highlighting during rapid clicking */
+    user-select: none; 
+  }
+  
+  /* Allow text selection in specific areas like inputs or leaderboards */
+  input, textarea, .selectable {
+    user-select: text;
   }
 }
 
-/* Custom utility classes for the hosting site */
 @layer utilities {
-  .glass-panel {
-    @apply bg-background/60 backdrop-blur-md border border-border/50 shadow-sm;
+  /* Custom animations for the Cookie Clicker game */
+  .animate-cookie-click {
+    animation: cookie-click 0.1s ease-in-out;
   }
-  
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500;
+
+  .animate-float-up {
+    animation: float-up 1s ease-out forwards;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes cookie-click {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+@keyframes float-up {
+  0% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-60px) scale(1.2); 
   }
 }

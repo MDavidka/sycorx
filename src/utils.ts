@@ -1,92 +1,109 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { InstanceStatus } from "./types";
+import { Upgrade } from "./types";
 
 /**
  * Merges Tailwind CSS classes safely.
- * Used extensively by shadcn/ui components.
+ * Standard utility used by shadcn/ui components.
  */
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 
 /**
- * Formats a number as a USD currency string.
+ * Formats a number into a compact, readable string (e.g., 1.5K, 2.3M).
+ * 
+ * @param num The number to format.
+ * @returns A formatted string representation of the number.
  */
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
-}
-
-/**
- * Formats an ISO date string into a human-readable format.
- */
-export function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(date);
-}
-
-/**
- * Formats bytes into a human-readable string (KB, MB, GB, TB).
- */
-export function formatBytes(bytes: number, decimals = 2): string {
-  if (!+bytes) return "0 Bytes";
-
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
-
-/**
- * Formats a decimal or whole number as a percentage.
- */
-export function formatPercentage(value: number): string {
-  return `${value.toFixed(1)}%`;
-}
-
-/**
- * Returns appropriate Tailwind color classes based on an instance's status.
- */
-export function getStatusColor(status: InstanceStatus): string {
-  switch (status) {
-    case "running":
-      return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
-    case "stopped":
-      return "bg-slate-500/10 text-slate-500 border-slate-500/20";
-    case "starting":
-    case "pending":
-      return "bg-amber-500/10 text-amber-500 border-amber-500/20";
-    case "error":
-      return "bg-red-500/10 text-red-500 border-red-500/20";
-    default:
-      return "bg-slate-500/10 text-slate-500 border-slate-500/20";
+export function formatNumber(num: number): string {
+  if (num < 1000) {
+    return Math.floor(num).toString();
   }
+
+  return new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 2,
+  }).format(Math.floor(num));
 }
 
 /**
- * Generates a simple unique ID for optimistic UI updates.
+ * Calculates the total Cookies Per Second (CPS) based on the player's inventory.
+ * 
+ * @param inventory A record mapping upgrade IDs to the quantity owned.
+ * @param availableUpgrades The master list of all available upgrades in the game.
+ * @returns The total calculated CPS.
  */
-export function generateId(): string {
-  return Math.random().toString(36).substring(2, 9);
+export function calculateCPS(
+  inventory: Record<string, number>,
+  availableUpgrades: Upgrade[]
+): number {
+  let totalCps = 0;
+
+  for (const [upgradeId, quantity] of Object.entries(inventory)) {
+    if (quantity <= 0) continue;
+
+    const upgrade = availableUpgrades.find((u) => u.id === upgradeId);
+    if (upgrade) {
+      totalCps += upgrade.cpsBoost * quantity;
+    }
+  }
+
+  return totalCps;
 }
 
 /**
- * A simple delay function for simulating network latency or polling.
+ * Calculates the cost of the next upgrade based on the base cost, multiplier, and quantity owned.
+ * Formula: BaseCost * (Multiplier ^ QuantityOwned)
+ * 
+ * @param baseCost The initial cost of the upgrade.
+ * @param costMultiplier The rate at which the cost increases per purchase.
+ * @param quantityOwned The number of this upgrade currently owned.
+ * @returns The calculated cost for the next purchase, rounded up to the nearest integer.
  */
-export function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export function calculateUpgradeCost(
+  baseCost: number,
+  costMultiplier: number,
+  quantityOwned: number
+): number {
+  if (quantityOwned === 0) return baseCost;
+  return Math.ceil(baseCost * Math.pow(costMultiplier, quantityOwned));
+}
+
+/**
+ * Calculates the number of cookies earned while the player was offline.
+ * 
+ * @param lastSaveTime The Unix timestamp (in milliseconds) of the last save.
+ * @param currentCps The player's current Cookies Per Second.
+ * @returns The total cookies earned offline.
+ */
+export function calculateOfflineProgress(
+  lastSaveTime: number,
+  currentCps: number
+): number {
+  if (!lastSaveTime || currentCps <= 0) return 0;
+
+  const now = Date.now();
+  const timeDiffMs = now - lastSaveTime;
+  
+  // Prevent negative time diffs (e.g., if system clock changes)
+  if (timeDiffMs <= 0) return 0;
+
+  const timeDiffSeconds = timeDiffMs / 1000;
+  
+  // Cap offline progress to a maximum of 7 days (604800 seconds) to prevent integer overflow/balance issues
+  const maxOfflineSeconds = 7 * 24 * 60 * 60;
+  const effectiveSeconds = Math.min(timeDiffSeconds, maxOfflineSeconds);
+
+  return Math.floor(effectiveSeconds * currentCps);
+}
+
+/**
+ * Generates a unique ID for a new user session if one doesn't exist.
+ * 
+ * @returns A random alphanumeric string.
+ */
+export function generateUserId(): string {
+  return Math.random().toString(36).substring(2, 15) + 
+         Math.random().toString(36).substring(2, 15);
 }
