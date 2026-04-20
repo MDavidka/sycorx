@@ -1,101 +1,207 @@
-import React from 'react';
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link } from "@heroui/react";
-import { Cookie, ShoppingCart, Trophy, Info } from 'lucide-react';
-import { formatNumber } from '../utils';
+import React, { useState, useEffect } from "react";
+import {
+  Navbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
+  NavbarMenuToggle,
+  NavbarMenu,
+  NavbarMenuItem,
+  Button,
+  Link,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Avatar
+} from "@heroui/react";
+import { Server, Activity, CreditCard, User, ChevronDown } from "lucide-react";
 
-export interface HeaderProps {
-  /** Total number of cookies the player currently has */
-  cookieCount: number;
-  /** Current Cookies Per Second */
-  cps: number;
-  /** The currently active route path (e.g., '/', '/shop') */
-  currentRoute: string;
-  /** Callback to handle navigation between views */
-  onRouteChange: (route: string) => void;
-}
+export function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
-export function Header({ 
-  cookieCount = 0, 
-  cps = 0, 
-  currentRoute = '/', 
-  onRouteChange 
-}: HeaderProps): JSX.Element {
-  
-  const navItems = [
-    { name: 'Home', route: '/', icon: Cookie },
-    { name: 'Shop', route: '/shop', icon: ShoppingCart },
-    { name: 'Leaderboard', route: '/leaderboard', icon: Trophy },
-    { name: 'About', route: '/about', icon: Info },
+  // Listen for route changes to update active states and auth UI
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    window.addEventListener("popstate", handleLocationChange);
+    return () => window.removeEventListener("popstate", handleLocationChange);
+  }, []);
+
+  // Simple mock auth state based on current route for SPA demonstration
+  const isLoggedIn = currentPath.includes('/dashboard') || currentPath.includes('/instance') || currentPath.includes('/billing');
+
+  // SPA Navigation handler
+  const navigateTo = (path: string) => {
+    window.history.pushState({}, "", path);
+    window.dispatchEvent(new Event("popstate"));
+    setIsMenuOpen(false);
+  };
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    e.preventDefault();
+    navigateTo(path);
+  };
+
+  const publicMenuItems = [
+    { name: "Home", path: "/" },
+    { name: "Pricing", path: "/#pricing" },
+    { name: "Features", path: "/#features" },
   ];
+
+  const privateMenuItems = [
+    { name: "Dashboard", path: "/dashboard", icon: <Activity className="w-4 h-4 mr-2" /> },
+    { name: "Billing", path: "/billing", icon: <CreditCard className="w-4 h-4 mr-2" /> },
+  ];
+
+  const menuItems = isLoggedIn ? privateMenuItems : publicMenuItems;
 
   return (
     <Navbar 
+      onMenuOpenChange={setIsMenuOpen} 
+      isMenuOpen={isMenuOpen} 
       maxWidth="xl" 
-      className="bg-background/95 backdrop-blur-md border-b border-border sticky top-0 z-50"
+      className="border-b border-border/50 bg-background/80 backdrop-blur-md"
     >
-      <NavbarBrand>
-        <div 
-          className="flex items-center gap-2 cursor-pointer group" 
-          onClick={() => onRouteChange('/')}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && onRouteChange('/')}
-          aria-label="Go to Home"
-        >
-          <Cookie className="w-8 h-8 text-primary group-hover:animate-cookie-bounce transition-transform" />
-          <p className="font-bold text-foreground text-xl hidden md:block tracking-tight">
-            Cookie Clicker
-          </p>
-        </div>
-      </NavbarBrand>
+      <NavbarContent>
+        <NavbarMenuToggle
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          className="sm:hidden"
+        />
+        <NavbarBrand>
+          <a 
+            href="/" 
+            onClick={(e) => handleLinkClick(e, "/")} 
+            className="flex items-center gap-2 text-primary transition-opacity hover:opacity-80"
+          >
+            <Server className="w-6 h-6" />
+            <p className="font-bold text-inherit text-foreground text-lg tracking-tight">
+              Modern<span className="text-primary">Hosting</span>
+            </p>
+          </a>
+        </NavbarBrand>
+      </NavbarContent>
 
-      <NavbarContent className="flex gap-1 sm:gap-4" justify="center">
-        {navItems.map((item) => {
-          const isActive = currentRoute === item.route;
-          return (
-            <NavbarItem key={item.route} isActive={isActive}>
-              <Link 
-                color={isActive ? "primary" : "foreground"}
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onRouteChange(item.route);
-                }}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-md transition-colors ${
-                  isActive 
-                    ? 'bg-primary/10 text-primary font-medium' 
-                    : 'hover:bg-secondary/50 text-muted-foreground hover:text-foreground'
-                }`}
-                title={item.name}
-                aria-current={isActive ? "page" : undefined}
-              >
-                <item.icon className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline text-sm">{item.name}</span>
-              </Link>
-            </NavbarItem>
-          );
-        })}
+      <NavbarContent className="hidden sm:flex gap-6" justify="center">
+        {menuItems.map((item, index) => (
+          <NavbarItem key={`${item.name}-${index}`} isActive={currentPath === item.path}>
+            <Link
+              color={currentPath === item.path ? "primary" : "foreground"}
+              href={item.path}
+              onClick={(e) => handleLinkClick(e, item.path)}
+              className="flex items-center text-sm font-medium transition-colors hover:text-primary"
+            >
+              {item.icon}
+              {item.name}
+            </Link>
+          </NavbarItem>
+        ))}
       </NavbarContent>
 
       <NavbarContent justify="end">
-        <NavbarItem className="flex flex-col items-end">
-          <div 
-            className="flex items-center gap-2 bg-secondary/40 px-3 py-1.5 rounded-full border border-border/50 shadow-sm"
-            title={`${cookieCount} Total Cookies`}
-          >
-            <Cookie className="w-4 h-4 text-primary" />
-            <span className="font-bold text-foreground tabular-nums tracking-tight">
-              {formatNumber(cookieCount)}
-            </span>
-          </div>
-          <span 
-            className="text-[10px] sm:text-xs text-muted-foreground font-medium mt-0.5 mr-2 tabular-nums"
-            title={`${cps} Cookies Per Second`}
-          >
-            {formatNumber(cps)} CPS
-          </span>
-        </NavbarItem>
+        {isLoggedIn ? (
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Button variant="light" className="flex items-center gap-2 px-2 min-w-0">
+                <Avatar 
+                  size="sm" 
+                  icon={<User className="w-4 h-4" />} 
+                  className="bg-primary/20 text-primary" 
+                />
+                <span className="hidden sm:inline-block text-sm font-medium truncate max-w-[100px]">
+                  Demo User
+                </span>
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Profile Actions" variant="flat">
+              <DropdownItem key="profile" className="h-14 gap-2" textValue="Profile">
+                <p className="font-semibold text-xs text-muted-foreground">Signed in as</p>
+                <p className="font-semibold text-sm text-foreground truncate">demo@modernhosting.com</p>
+              </DropdownItem>
+              <DropdownItem 
+                key="dashboard" 
+                onClick={() => navigateTo("/dashboard")}
+                textValue="Dashboard"
+              >
+                Dashboard
+              </DropdownItem>
+              <DropdownItem 
+                key="billing" 
+                onClick={() => navigateTo("/billing")}
+                textValue="Billing"
+              >
+                Billing
+              </DropdownItem>
+              <DropdownItem 
+                key="logout" 
+                color="danger" 
+                className="text-danger"
+                onClick={() => navigateTo("/")}
+                textValue="Log Out"
+              >
+                Log Out
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        ) : (
+          <>
+            <NavbarItem className="hidden lg:flex">
+              <Link 
+                href="/login" 
+                onClick={(e) => handleLinkClick(e, "/login")} 
+                color="foreground" 
+                className="text-sm font-medium hover:text-primary transition-colors"
+              >
+                Login
+              </Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Button 
+                as={Link} 
+                color="primary" 
+                href="/login" 
+                onClick={(e) => handleLinkClick(e, "/login")} 
+                variant="flat" 
+                className="font-medium"
+              >
+                Sign Up
+              </Button>
+            </NavbarItem>
+          </>
+        )}
       </NavbarContent>
+
+      <NavbarMenu className="bg-background/95 backdrop-blur-md pt-6">
+        {menuItems.map((item, index) => (
+          <NavbarMenuItem key={`${item.name}-${index}`}>
+            <Link
+              color={currentPath === item.path ? "primary" : "foreground"}
+              className="w-full flex items-center py-2 text-lg"
+              href={item.path}
+              onClick={(e) => handleLinkClick(e, item.path)}
+            >
+              {item.icon}
+              {item.name}
+            </Link>
+          </NavbarMenuItem>
+        ))}
+        {!isLoggedIn && (
+          <NavbarMenuItem className="mt-4 border-t border-border/50 pt-4">
+            <Link
+              color="primary"
+              className="w-full py-2 text-lg font-medium"
+              href="/login"
+              onClick={(e) => handleLinkClick(e, "/login")}
+            >
+              Login / Sign Up
+            </Link>
+          </NavbarMenuItem>
+        )}
+      </NavbarMenu>
     </Navbar>
   );
 }
