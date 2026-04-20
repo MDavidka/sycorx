@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Bakery Theme - Light Mode */
+    --background: 40 33% 98%; /* #fdfbf7 */
+    --foreground: 22 19% 24%; /* #4a3b32 */
+
+    --card: 40 33% 98%;
+    --card-foreground: 22 19% 24%;
+
+    --popover: 40 33% 98%;
+    --popover-foreground: 22 19% 24%;
+
+    --primary: 30 53% 64%; /* Golden yellow/cookie #d4a373 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 43 74% 89%; /* Tan #faedcd */
+    --secondary-foreground: 22 19% 24%;
+
+    --muted: 54 79% 94%; /* Beige #fefae0 */
+    --muted-foreground: 22 19% 40%;
+
+    --accent: 29 53% 36%; /* Chocolate #8b5a2b */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 28 43% 80%; /* Soft brown #e6ccb2 */
+    --input: 28 43% 80%;
+    --ring: 30 53% 64%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Bakery Theme - Dark Mode */
+    --background: 23 30% 8%; /* Very dark brown #1c140f */
+    --foreground: 40 33% 98%; /* Cream #fdfbf7 */
+
+    --card: 23 30% 10%;
+    --card-foreground: 40 33% 98%;
+
+    --popover: 23 30% 10%;
+    --popover-foreground: 40 33% 98%;
+
+    --primary: 30 53% 64%; /* Golden yellow #d4a373 */
+    --primary-foreground: 23 30% 8%;
+
+    --secondary: 9 28% 19%; /* Darker tan #3e2723 */
+    --secondary-foreground: 40 33% 98%;
+
+    --muted: 23 32% 15%; /* Dark brown #2b1e16 */
+    --muted-foreground: 40 33% 70%;
+
+    --accent: 29 53% 36%; /* Chocolate #8b5a2b */
+    --accent-foreground: 40 33% 98%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 40 33% 98%;
+
+    --border: 22 19% 24%; /* Medium brown #4a3b32 */
+    --input: 22 19% 24%;
+    --ring: 30 53% 64%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased selection:bg-primary/30;
+  }
+}
+
+@layer utilities {
+  /* Custom animations for the cookie clicker */
+  .animate-cookie-bounce {
+    animation: cookie-bounce 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes cookie-bounce {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(0.92);
+    }
+  }
+
+  .animate-float-up {
+    animation: float-up 1s ease-out forwards;
+  }
+
+  @keyframes float-up {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-50px) scale(1.2);
+    }
+  }
+  
+  /* Hide scrollbar for clean UI in shop lists */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
