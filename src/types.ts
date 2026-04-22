@@ -1,97 +1,75 @@
 /**
- * Shared TypeScript interfaces and types for the Cookie Clicker application.
- */
-
-// ==========================================
-// Site & Navigation Types
-// ==========================================
-
-export interface SiteConfig {
-  name: string;
-  description: string;
-  url: string;
-}
-
-export interface NavItem {
-  title: string;
-  href: string;
-  disabled?: boolean;
-  icon?: string;
-}
-
-// ==========================================
-// Game Mechanics Types
-// ==========================================
-
-/**
- * Defines a purchasable upgrade in the game.
- */
-export interface Upgrade {
-  id: string;
-  name: string;
-  description: string;
-  baseCost: number;
-  costMultiplier: number; // How much the cost increases per purchase (e.g., 1.15)
-  cpsBoost: number; // Cookies Per Second added per unit of this upgrade
-  iconUrl?: string; // Optional URL for the upgrade's icon
-}
-
-/**
- * Represents the current state of a player's game.
+ * Represents the core state of the player's game.
+ * This is the object that will be saved to and loaded from local storage.
  */
 export interface GameState {
-  cookies: number; // Current unspent cookies
-  totalCookiesBaked: number; // Lifetime cookies earned (used for achievements/leaderboard)
-  cps: number; // Current Cookies Per Second
-  clickPower: number; // How many cookies are earned per manual click
-  inventory: Record<string, number>; // Map of upgradeId to quantity owned
-  lastSaveTime: number; // Unix timestamp of the last save (used for offline progress calculation)
-}
-
-// ==========================================
-// User & Database Types
-// ==========================================
-
-/**
- * Represents a user's profile and saved data in the database.
- */
-export interface UserData {
-  _id?: string; // MongoDB document ID
-  userId: string; // Unique identifier for the user (e.g., session ID or auth ID)
-  username: string; // Display name for the leaderboard
-  gameState: GameState; // The user's saved game progress
-  createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
+    /** The player's chosen display name */
+    playerName: string;
+    /** Current number of cookies available to spend */
+    cookies: number;
+    /** Total number of cookies ever baked (used for leaderboard score) */
+    totalCookies: number;
+    /** Current passive cookie generation rate per second */
+    cookiesPerSecond: number;
+    /** A map of upgrade IDs to the quantity owned by the player */
+    inventory: Record<string, number>;
+    /** Unix timestamp of the last time the game was saved (used for offline progress) */
+    lastSaveTime: number;
 }
 
 /**
- * Represents a single entry on the global leaderboard.
+ * Defines a purchasable building/upgrade in the shop.
  */
-export interface LeaderboardEntry {
-  username: string;
-  totalCookiesBaked: number;
-  cps: number;
+export interface UpgradeItem {
+    /** Unique identifier for the upgrade (e.g., 'cursor', 'grandma') */
+    id: string;
+    /** Display name of the upgrade */
+    name: string;
+    /** Flavor text or description */
+    description: string;
+    /** The initial cost of the first unit */
+    baseCost: number;
+    /** The multiplier applied to the cost for each subsequent purchase (typically 1.15) */
+    costMultiplier: number;
+    /** The amount of Cookies Per Second (CPS) one unit of this upgrade provides */
+    baseCps: number;
+    /** URL to the placeholder image/icon for this upgrade */
+    iconUrl: string;
 }
 
-// ==========================================
-// Component Prop Types
-// ==========================================
-
-export interface CookieButtonProps {
-  onClick: () => void;
-  clickPower: number;
-  disabled?: boolean;
+/**
+ * Represents a player's score entry on the global leaderboard.
+ * Matches the schema expected by the MongoDB database.
+ */
+export interface PlayerScore {
+    /** Optional MongoDB document ID */
+    _id?: string;
+    /** The player's display name */
+    playerName: string;
+    /** The total number of cookies ever baked by the player */
+    score: number;
+    /** ISO 8601 timestamp of when the score was last updated */
+    updatedAt: string;
 }
 
-export interface UpgradeCardProps {
-  upgrade: Upgrade;
-  quantityOwned: number;
-  currentCost: number;
-  canAfford: boolean;
-  onPurchase: (upgradeId: string, cost: number) => void;
+/**
+ * Defines the available views in the application routing.
+ */
+export type ViewState = 'game' | 'leaderboard' | 'settings';
+
+/**
+ * Configuration object for initializing the game engine.
+ */
+export interface GameEngineConfig {
+    /** The DOM element where the app is mounted */
+    rootElement: HTMLElement;
+    /** The interval in milliseconds for the main game loop (e.g., 1000 / 60 for 60fps) */
+    tickRateMs: number;
+    /** The interval in milliseconds for auto-saving to local storage */
+    saveIntervalMs: number;
 }
 
-export interface HeaderProps {
-  currentCookies: number;
-  cps: number;
-}
+/**
+ * Callback type for when the game state changes, used to trigger UI re-renders.
+ */
+export type StateChangeCallback = (newState: GameState) => void;

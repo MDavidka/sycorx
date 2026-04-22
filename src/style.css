@@ -4,114 +4,93 @@
 
 @layer base {
   :root {
-    /* Light Theme: Bakery Day */
-    --background: 40 33% 98%; /* Soft cream #fdfbf7 */
-    --foreground: 24 20% 15%; /* Dark brown #2d241e */
-
-    --card: 0 0% 100%;
-    --card-foreground: 24 20% 15%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 24 20% 15%;
-
-    --primary: 32 95% 44%; /* Warm cookie brown / amber-600 */
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 45 93% 88%; /* Lighter tan / amber-100 */
-    --secondary-foreground: 24 20% 15%;
-
-    --muted: 40 20% 94%; /* Soft gray-brown */
-    --muted-foreground: 24 5% 45%;
-
-    --accent: 45 93% 56%; /* Vibrant gold / amber-400 */
-    --accent-foreground: 24 20% 15%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 40 20% 90%;
-    --input: 40 20% 90%;
-    --ring: 32 95% 44%;
-
-    --radius: 0.75rem;
+    /* Design System Colors */
+    --color-primary: #5c3a21; /* Chocolate Brown */
+    --color-secondary: #f4d03f; /* Golden Dough */
+    --color-accent: #3498db; /* Vibrant Blue */
+    --color-bg: #fdf5e6; /* Cream/Light Beige */
+    --color-text: #3e2723; /* Dark Cocoa */
+    
+    /* Typography */
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
-  .dark {
-    /* Dark Theme: Night Shift Bakery */
-    --background: 24 10% 10%; /* Deep dark brown/charcoal #1c1917 */
-    --foreground: 40 33% 98%; /* Soft cream #fdfbf7 */
-
-    --card: 24 10% 12%;
-    --card-foreground: 40 33% 98%;
-
-    --popover: 24 10% 12%;
-    --popover-foreground: 40 33% 98%;
-
-    --primary: 38 92% 50%; /* Warm cookie brown / amber-500 */
-    --primary-foreground: 24 20% 15%;
-
-    --secondary: 24 7% 15%; /* Darker brown */
-    --secondary-foreground: 40 33% 98%;
-
-    --muted: 24 7% 15%;
-    --muted-foreground: 24 5% 64%;
-
-    --accent: 45 93% 56%; /* Vibrant gold */
-    --accent-foreground: 24 20% 15%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 24 6% 25%;
-    --input: 24 6% 25%;
-    --ring: 38 92% 50%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
   body {
-    @apply bg-background text-foreground antialiased selection:bg-primary/30;
-    /* Prevent text selection on the body to avoid highlighting during rapid clicking */
-    user-select: none; 
-  }
-  
-  /* Allow text selection in specific areas like inputs or leaderboards */
-  input, textarea, .selectable {
-    user-select: text;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    /* Prevent text selection to make clicking feel more like a game */
+    user-select: none;
+    -webkit-user-select: none;
+    /* Prevent pull-to-refresh on mobile */
+    overscroll-behavior-y: contain;
   }
 }
 
 @layer utilities {
-  /* Custom animations for the Cookie Clicker game */
+  /* Custom utility classes for animations that are too complex for arbitrary values */
   .animate-cookie-click {
-    animation: cookie-click 0.1s ease-in-out;
+    animation: cookie-click 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .animate-cookie-idle {
+    animation: cookie-idle 4s ease-in-out infinite;
   }
 
   .animate-float-up {
-    animation: float-up 1s ease-out forwards;
-  }
-
-  .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: float-up 1s cubic-bezier(0, 0, 0.2, 1) forwards;
   }
 }
 
+/* Keyframes for game effects */
 @keyframes cookie-click {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.92); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes cookie-idle {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.02) rotate(1deg);
+  }
 }
 
 @keyframes float-up {
-  0% { 
-    opacity: 1; 
-    transform: translateY(0) scale(1); 
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
-  100% { 
-    opacity: 0; 
-    transform: translateY(-60px) scale(1.2); 
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(1.5);
   }
+}
+
+/* Custom Scrollbar for Shop and Leaderboard panels */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(92, 58, 33, 0.1); /* Transparent primary */
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text);
 }

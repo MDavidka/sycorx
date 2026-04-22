@@ -7,10 +7,43 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+.env.production
+.env.local
+
+# Vite output
+dist/
+dist-ssr/
+
+# TypeScript cache
+*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
@@ -22,8 +55,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Env
-.env
-.env.*
-!.env.example

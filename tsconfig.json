@@ -12,16 +12,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "useDefineForClassFields": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
+    "noEmit": true
   },
   "include": [
     "src"
