@@ -5,20 +5,24 @@
       "label": "Home"
     },
     {
-      "to": "/products",
-      "label": "Products"
+      "to": "/shop",
+      "label": "Shop"
     },
     {
-      "to": "/categories",
-      "label": "Categories"
+      "to": "/cart",
+      "label": "Cart"
     },
     {
-      "to": "/deals",
-      "label": "Deals"
+      "to": "/checkout",
+      "label": "Checkout"
     },
     {
       "to": "/about",
       "label": "About"
+    },
+    {
+      "to": "/delivery",
+      "label": "Delivery"
     },
     {
       "to": "/contact",

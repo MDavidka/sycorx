@@ -1,27 +1,34 @@
-export function submitForm(event: { preventDefault(): void; target?: HTMLFormElement }): void {
+export function submitContactForm(event: { preventDefault(): void; target: unknown }): void {
   event.preventDefault()
   const form = event.target as HTMLFormElement
-  if (!form) return
-
   const formData = new FormData(form)
-  const data = Object.fromEntries(formData.entries())
-
+  
   fetch('/api/contact', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    body: formData
   })
-    .then(() => {
-      window.alert('Thank you for your message! We will get back to you within 24 hours.')
+  .then(async (response) => {
+    if (response.ok) {
       form.reset()
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    })
-    .catch(() => {
-      window.alert('Something went wrong. Please try again or call our 24/7 support line.')
-    })
+      const ticketId = `TKT-${Date.now().toString().slice(-6)}`
+      window.alert(`Thank you! Your ticket ${ticketId} has been created. We'll respond within 2 hours.`)
+    } else {
+      throw new Error('Submission failed')
+    }
+  })
+  .catch(() => {
+    window.alert('Something went wrong. Please try again.')
+  })
 }
 
-export function openLiveChat(event: { preventDefault(): void }): void {
-  event.preventDefault()
-  window.open('https://livechat.example.com', '_blank', 'width=400,height=600')
+export function setFiles(event: { target: { files: FileList | null } }): void {
+  const files = Array.from(event.target.files || [])
+  if (files.length > 0) {
+    const fileNames = files.map(f => f.name).join(', ')
+    window.alert(`${files.length} file(s) selected: ${fileNames.slice(0, 50)}${fileNames.length > 50 ? '...' : ''}`)
+  }
+}
+
+export function toggleChat(): void {
+  window.alert('Live chat demo: Connecting to floral expert... (This is a demo widget)')
 }

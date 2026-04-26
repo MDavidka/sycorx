@@ -2,10 +2,11 @@ import { Routes, Route } from 'react-router-dom'
 import { SiteNav } from './components/site-nav'
 import siteStructure from './data/site-structure.json'
 import { Home } from './pages/index'
-import { Products } from './pages/products'
-import { Categories } from './pages/categories'
-import { Deals } from './pages/deals'
+import { Shop } from './pages/shop'
+import { Cart } from './pages/cart'
+import { Checkout } from './pages/checkout'
 import { About } from './pages/about'
+import { Delivery } from './pages/delivery'
 import { Contact } from './pages/contact'
 
 export default function App() {
@@ -15,10 +16,11 @@ export default function App() {
       <main className="flex-1">
         <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/categories" element={<Categories />} />
-        <Route path="/deals" element={<Deals />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="/about" element={<About />} />
+        <Route path="/delivery" element={<Delivery />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<Home />} />
         </Routes>

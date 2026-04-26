@@ -2,14 +2,14 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-export function Products() {
-  React.useEffect(() => { document.title = "Products" }, [])
+export function Shop() {
+  React.useEffect(() => { document.title = "Shop" }, [])
 
   return (
     <main className="min-h-screen bg-background text-foreground">
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">Products</h1>
-        <p className="mt-6 max-w-2xl text-lg text-muted-foreground">The product catalog serves shoppers ready to browse inventory, displaying all available phones with filters and sorting. Content includes a sortable table/grid of phones showing model, price, storage options, camera specs, battery life, and stock status; sidebar filters for brand (Apple, Samsung, Google), price range, and screen size; product comparison modal; and pagination for 50+ items. Primary CTA is 'Add to Cart' buttons linking to /cart.</p>
+        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">Shop</h1>
+        <p className="mt-6 max-w-2xl text-lg text-muted-foreground">The product catalog page serves shoppers ready to purchase, displaying all available flowers organized by category (bouquets, single stems, plants, gifts) with filtering and sorting options. It renders a filter sidebar (price range, color, occasion, delivery date), sortable product table/grid with images/prices/availability/stocks remaining badges, and product detail modals showing descriptions/add-ons (vase, card, chocolate). Primary CTA 'Add to Cart' button on each product leads to /cart for checkout.</p>
         <div className="mt-8 flex flex-wrap gap-4">
           <Button size="lg">
             <span>Get started</span>
@@ -24,50 +24,50 @@ export function Products() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card className="p-6">
             <CardHeader>
-              <CardTitle>Filter sidebar with brand/price/screen size sliders</CardTitle>
+              <CardTitle>Sidebar filters for occasion (birthday, wedding, sympathy), color, price</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Filter sidebar with brand/price/screen size sliders</p>
+              <p className="text-sm text-muted-foreground">Sidebar filters for occasion (birthday, wedding, sympathy), color, price</p>
             </CardContent>
           </Card>
           <Card className="p-6">
             <CardHeader>
-              <CardTitle>Sortable product table (price, rating, newest)</CardTitle>
+              <CardTitle>Sort dropdown (price low-high, popularity, newest)</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Sortable product table (price, rating, newest)</p>
+              <p className="text-sm text-muted-foreground">Sort dropdown (price low-high, popularity, newest)</p>
             </CardContent>
           </Card>
           <Card className="p-6">
             <CardHeader>
-              <CardTitle>Product comparison modal (select up to 4 phones)</CardTitle>
+              <CardTitle>Product cards with stock badges and 'Low Stock' warnings</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Product comparison modal (select up to 4 phones)</p>
+              <p className="text-sm text-muted-foreground">Product cards with stock badges and 'Low Stock' warnings</p>
             </CardContent>
           </Card>
           <Card className="p-6">
             <CardHeader>
-              <CardTitle>Stock status badges (In Stock, Low Stock, Sold Out)</CardTitle>
+              <CardTitle>Quick-view modal with zoomable images and add-to-cart form</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Stock status badges (In Stock, Low Stock, Sold Out)</p>
+              <p className="text-sm text-muted-foreground">Quick-view modal with zoomable images and add-to-cart form</p>
             </CardContent>
           </Card>
           <Card className="p-6">
             <CardHeader>
-              <CardTitle>Quick view modal with full specs and buy button</CardTitle>
+              <CardTitle>Pagination for 24+ products with page numbers</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Quick view modal with full specs and buy button</p>
+              <p className="text-sm text-muted-foreground">Pagination for 24+ products with page numbers</p>
             </CardContent>
           </Card>
           <Card className="p-6">
             <CardHeader>
-              <CardTitle>Pagination with 12/24/48 items per page</CardTitle>
+              <CardTitle>'Out of Stock' overlay with notify-me form</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Pagination with 12/24/48 items per page</p>
+              <p className="text-sm text-muted-foreground">'Out of Stock' overlay with notify-me form</p>
             </CardContent>
           </Card>
         </div>
