@@ -1,12 +1,12 @@
 import type { Metadata } from "next"
 
 export const siteConfig = {
-  "name": "sycord",
-  "tagline": "Frictionless Hosting for Modern Apps",
-  "description": "Sycord delivers instant deployments, global edge caching, and zero-config scaling for your web apps, APIs, and static sites. Deploy from Git in seconds with built-in previews and rollbacks.",
-  "audience": "Developers, startups, and agencies building SaaS, e-commerce, and high-traffic apps",
+  "name": "sycord+",
+  "tagline": "Next-generation cloud hosting for modern developers.",
+  "description": "Deploy, scale, and manage your applications globally with zero configuration. Experience lightning-fast edge infrastructure built for the future.",
+  "audience": "Developers, startups, and enterprise engineering teams.",
   "category": null,
-  "logoUrl": null,
+  "logoUrl": "https://img.pikbest.com/png-images/20241022/stealth-masked-hacker-gaming-logo-for-gamers_10991543.png!w700wp",
   "logoInitials": "S",
   "navLinks": [
     {
@@ -22,38 +22,34 @@ export const siteConfig = {
       "href": "/pricing"
     },
     {
-      "label": "Docs",
-      "href": "/docs"
+      "label": "Dashboard",
+      "href": "/dashboard"
     }
   ],
   "primaryCta": {
-    "label": "Deploy Now",
-    "href": "/signup"
+    "label": "Start Deploying",
+    "href": "/login"
   },
   "secondaryCta": {
-    "label": "View Docs",
-    "href": "/docs"
+    "label": "View Documentation",
+    "href": "/features"
   },
   "footerCta": {
-    "label": "Start Free Trial",
-    "href": "/signup"
+    "label": "Deploy Now",
+    "href": "/login"
   },
   "socialLinks": [
     {
       "label": "GitHub",
-      "href": "https://github.com/sycord"
+      "href": "#"
     },
     {
       "label": "Twitter",
-      "href": "https://twitter.com/sycord"
-    },
-    {
-      "label": "Discord",
-      "href": "https://discord.gg/sycord"
+      "href": "#"
     }
   ],
   "contact": {
-    "email": "hello@sycord.com"
+    "email": "support@sycord.plus"
   },
   "themePreset": "saas",
   "integrations": [
@@ -61,10 +57,19 @@ export const siteConfig = {
       "kind": "database",
       "name": "Turso",
       "provider": "turso",
-      "reason": "Store user accounts, deployments, billing data, project configs, and usage metrics",
+      "reason": "Required by strict system rules for database persistence.",
       "envVars": [
         "TURSO_DATABASE_URL",
         "TURSO_AUTH_TOKEN"
+      ]
+    },
+    {
+      "kind": "database",
+      "name": "MongoDB",
+      "provider": "mongodb",
+      "reason": "Existing environment variable context for primary application data.",
+      "envVars": [
+        "MONGODB_URI"
       ]
     }
   ],

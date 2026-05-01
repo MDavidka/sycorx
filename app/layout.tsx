@@ -4,14 +4,15 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 
 export const metadata: Metadata = {
-  title: "sycord — Frictionless Hosting for Modern Apps",
-  description: "Sycord delivers instant deployments, global edge caching, and zero-config scaling for your web apps, APIs, and static sites. Deploy from Git in seconds with built-in previews and rollbacks.",
+  title: "sycord+ — Next-generation cloud hosting for modern developers.",
+  description: "Deploy, scale, and manage your applications globally with zero configuration. Experience lightning-fast edge infrastructure built for the future.",
   openGraph: {
-    title: "sycord — Frictionless Hosting for Modern Apps",
-    description: "Sycord delivers instant deployments, global edge caching, and zero-config scaling for your web apps, APIs, and static sites. Deploy from Git in seconds with built-in previews and rollbacks.",
-    siteName: "sycord",
+    title: "sycord+ — Next-generation cloud hosting for modern developers.",
+    description: "Deploy, scale, and manage your applications globally with zero configuration. Experience lightning-fast edge infrastructure built for the future.",
+    siteName: "sycord+",
     type: "website",
   },
+  icons: { icon: "https://img.pikbest.com/png-images/20241022/stealth-masked-hacker-gaming-logo-for-gamers_10991543.png!w700wp", apple: "https://img.pikbest.com/png-images/20241022/stealth-masked-hacker-gaming-logo-for-gamers_10991543.png!w700wp" },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

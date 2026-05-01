@@ -1,15 +1,14 @@
 import Link from "next/link"
-import { Check, Globe, Quote, Sparkles } from "lucide-react"
+import { Quote, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { type Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Sycord - Deploy Web Apps in Seconds",
-  description: "Global edge hosting with instant Git deployments, previews, and zero-config scaling. Perfect for SaaS, APIs, and static sites.",
+  title: "sycord+ | Deploy and scale in seconds",
+  description: "The fastest way to deploy your full-stack applications to the edge. Zero config, infinite scale.",
 }
 
 export default function HomePage() {
@@ -21,10 +20,10 @@ export default function HomePage() {
         <div className="mx-auto max-w-3xl text-center space-y-5">
           
           <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">Ship something people remember.</h1>
-          
+          <p className="mx-auto max-w-2xl text-pretty text-lg text-muted-foreground">sycord+ provides edge-optimized infrastructure for your Next.js, Node, and static applications. Push to main and we handle the rest.</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg"><Link href="/signup">Deploy Now</Link></Button>
-            <Button asChild size="lg" variant="outline"><Link href="/pricing">See pricing</Link></Button>
+            <Button asChild size="lg"><Link href="/login">Start for free</Link></Button>
+            <Button asChild size="lg" variant="outline"><Link href="/features">Read the docs</Link></Button>
           </div>
         </div>
         <div className="relative mx-auto mt-14 max-w-5xl">
@@ -37,16 +36,16 @@ export default function HomePage() {
             </div>
             <div className="grid gap-4 p-6 sm:grid-cols-3">
               <div className="rounded-xl border bg-background p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground"></p>
-                <p className="mt-2 text-2xl font-semibold tracking-tight">Connect Git repo</p>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">MRR growth</p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight">+38%</p>
               </div>
               <div className="rounded-xl border bg-background p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground"></p>
-                <p className="mt-2 text-2xl font-semibold tracking-tight">One-click deploy</p>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Active teams</p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight">12k</p>
               </div>
               <div className="rounded-xl border bg-background p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground"></p>
-                <p className="mt-2 text-2xl font-semibold tracking-tight">Global CDN ready</p>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Avg response</p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight">&lt;200ms</p>
               </div>
             </div>
             <div className="border-t px-6 py-4 text-xs text-muted-foreground">Live, customizable, and ready in minutes.</div>
@@ -56,26 +55,16 @@ export default function HomePage() {
     </section>
 
 <section className="relative w-full ">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20 lg:px-8">
-        
-        <dl className="mt-10 grid gap-y-8 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-border">
-          <div className="px-2 text-center sm:px-6">
-            <dd className="text-4xl font-semibold tracking-tight sm:text-5xl">247</dd>
-            <dt className="mt-2 text-sm text-muted-foreground">ms avg deploy</dt>
-          </div>
-          <div className="px-2 text-center sm:px-6">
-            <dd className="text-4xl font-semibold tracking-tight sm:text-5xl">12</dd>
-            <dt className="mt-2 text-sm text-muted-foreground">global regions</dt>
-          </div>
-          <div className="px-2 text-center sm:px-6">
-            <dd className="text-4xl font-semibold tracking-tight sm:text-5xl">50k</dd>
-            <dt className="mt-2 text-sm text-muted-foreground">apps hosted</dt>
-          </div>
-          <div className="px-2 text-center sm:px-6">
-            <dd className="text-4xl font-semibold tracking-tight sm:text-5xl">99.99%</dd>
-            <dt className="mt-2 text-sm text-muted-foreground">uptime SLA</dt>
-          </div>
-        </dl>
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <p className="text-center text-sm font-medium uppercase tracking-wider text-muted-foreground">Trusted by teams everywhere</p>
+        <div className="mt-8 grid grid-cols-2 items-center justify-items-center gap-x-8 gap-y-6 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">Next.js</div>
+          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">React</div>
+          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">Node.js</div>
+          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">Docker</div>
+          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">Redis</div>
+          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">PostgreSQL</div>
+        </div>
       </div>
     </section>
 
@@ -84,38 +73,38 @@ export default function HomePage() {
         <div className="mx-auto max-w-3xl text-center space-y-4">
           
           <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Built for teams who care about the details</h2>
-          
+          <p className="mx-auto max-w-2xl text-pretty text-muted-foreground">Stop worrying about servers. We provide a complete toolkit for modern full-stack development.</p>
         </div>
         <div className="mt-12 grid gap-4 lg:grid-cols-3">
           <Card className="lg:col-span-2 relative overflow-hidden border-border/60">
             <CardHeader>
               <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><Sparkles className="h-5 w-5" /></div>
-              <CardTitle className="text-xl">Instant Git Deployments</CardTitle>
-              <CardDescription className="text-base">Push to deploy. Automatic builds for Next.js, Nuxt, SvelteKit, Remix, and 50+ frameworks.</CardDescription>
-            </CardHeader>
-            
-          </Card>
-          <Card className="lg:col-span-1 relative overflow-hidden border-border/60">
-            <CardHeader>
-              <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><Globe className="h-5 w-5" /></div>
               <CardTitle className="text-xl">Global Edge Network</CardTitle>
-              <CardDescription className="text-base">12 regions, 200+ edge locations. Serve users from the closest PoP with sub-50ms latency.</CardDescription>
+              <CardDescription className="text-base">Your code runs within 50ms of your users, anywhere in the world.</CardDescription>
             </CardHeader>
             
           </Card>
           <Card className="lg:col-span-1 relative overflow-hidden border-border/60">
             <CardHeader>
               <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><Sparkles className="h-5 w-5" /></div>
-              <CardTitle className="text-xl">Preview Deployments</CardTitle>
-              <CardDescription className="text-base">Every PR gets a unique preview URL. Test changes before they hit production.</CardDescription>
+              <CardTitle className="text-xl">Instant Rollbacks</CardTitle>
+              <CardDescription className="text-base">Bad deployment? Revert to any previous build in under a second.</CardDescription>
+            </CardHeader>
+            
+          </Card>
+          <Card className="lg:col-span-1 relative overflow-hidden border-border/60">
+            <CardHeader>
+              <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><Sparkles className="h-5 w-5" /></div>
+              <CardTitle className="text-xl">Zero-Config CI/CD</CardTitle>
+              <CardDescription className="text-base">Connect your GitHub repo and we automatically build and deploy on every push.</CardDescription>
             </CardHeader>
             
           </Card>
           <Card className="lg:col-span-2 relative overflow-hidden border-border/60">
             <CardHeader>
               <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><Sparkles className="h-5 w-5" /></div>
-              <CardTitle className="text-xl">Zero-Config Scaling</CardTitle>
-              <CardDescription className="text-base">Auto-scale to zero or millions. Handle traffic spikes without touching config.</CardDescription>
+              <CardTitle className="text-xl">DDoS Protection</CardTitle>
+              <CardDescription className="text-base">Enterprise-grade mitigation against L3/L4 and L7 attacks built-in.</CardDescription>
             </CardHeader>
             
           </Card>
@@ -124,15 +113,28 @@ export default function HomePage() {
     </section>
 
 <section className="relative w-full ">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <p className="text-center text-sm font-medium uppercase tracking-wider text-muted-foreground">Trusted by teams everywhere</p>
-        <div className="mt-8 grid grid-cols-2 items-center justify-items-center gap-x-8 gap-y-6 sm:grid-cols-3 lg:grid-cols-6">
-          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">Vercel</div>
-          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">Netlify</div>
-          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">Stripe</div>
-          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">Supabase</div>
-          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">Auth0</div>
-          <div className="text-base font-semibold tracking-tight text-muted-foreground/70 transition hover:text-foreground">PlanetScale</div>
+      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 md:py-24 lg:px-8">
+        <div className="mx-auto max-w-3xl space-y-4 text-center">
+          
+          <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">How it works</h2>
+          <p className="mx-auto max-w-2xl text-pretty text-muted-foreground">We streamlined the deployment pipeline so you can focus on writing code.</p>
+        </div>
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-2xl border bg-card p-6">
+            <p className="text-5xl font-semibold tracking-tight text-primary/60">01</p>
+            <h3 className="mt-4 text-lg font-semibold">Connect Repository</h3>
+            <p className="mt-2 text-sm text-muted-foreground">Link your GitHub, GitLab, or Bitbucket account with a single click.</p>
+          </div>
+          <div className="rounded-2xl border bg-card p-6">
+            <p className="text-5xl font-semibold tracking-tight text-primary/60">02</p>
+            <h3 className="mt-4 text-lg font-semibold">Configure Build</h3>
+            <p className="mt-2 text-sm text-muted-foreground">sycord+ automatically detects your framework and sets the optimal build commands.</p>
+          </div>
+          <div className="rounded-2xl border bg-card p-6">
+            <p className="text-5xl font-semibold tracking-tight text-primary/60">03</p>
+            <h3 className="mt-4 text-lg font-semibold">Push to Live</h3>
+            <p className="mt-2 text-sm text-muted-foreground">Every commit generates a preview URL. Merge to main to deploy to production.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -142,18 +144,18 @@ export default function HomePage() {
         <div className="mx-auto max-w-3xl text-center space-y-4">
           
           <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Loved by people who care about quality</h2>
-          
+          <p className="mx-auto max-w-2xl text-pretty text-muted-foreground">See why thousands of developers trust sycord+ with their production workloads.</p>
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <Card className="border-border/60">
             <CardContent className="p-6">
               <Quote className="h-6 w-6 text-primary/40" />
-              <p className="mt-4 text-pretty text-base leading-relaxed">"Sycord cut our deploy times from 8 minutes to 12 seconds. Game changer."</p>
+              <p className="mt-4 text-pretty text-base leading-relaxed">"Moving to sycord+ cut our deployment times by 80%. The edge caching is practically magic."</p>
               <div className="mt-6 flex items-center gap-3">
-                <Avatar className="h-9 w-9"><AvatarFallback>SK</AvatarFallback></Avatar>
+                <Avatar className="h-9 w-9"><AvatarFallback>SJ</AvatarFallback></Avatar>
                 <div>
-                  <p className="text-sm font-semibold">Sarah K.</p>
-                  <p className="text-xs text-muted-foreground">CTO @ Fintech Startup</p>
+                  <p className="text-sm font-semibold">Sarah Jenkins</p>
+                  <p className="text-xs text-muted-foreground">CTO at TechFlow</p>
                 </div>
               </div>
             </CardContent>
@@ -161,12 +163,12 @@ export default function HomePage() {
           <Card className="border-border/60">
             <CardContent className="p-6">
               <Quote className="h-6 w-6 text-primary/40" />
-              <p className="mt-4 text-pretty text-base leading-relaxed">"Global edge caching without the Vercel price tag. Perfect for our SaaS."</p>
+              <p className="mt-4 text-pretty text-base leading-relaxed">"We used to spend hours configuring AWS. Now we just push to GitHub and go to sleep."</p>
               <div className="mt-6 flex items-center gap-3">
-                <Avatar className="h-9 w-9"><AvatarFallback>MR</AvatarFallback></Avatar>
+                <Avatar className="h-9 w-9"><AvatarFallback>MT</AvatarFallback></Avatar>
                 <div>
-                  <p className="text-sm font-semibold">Mike R.</p>
-                  <p className="text-xs text-muted-foreground">Founder @ Agency</p>
+                  <p className="text-sm font-semibold">Marcus Thorne</p>
+                  <p className="text-xs text-muted-foreground">Lead Engineer</p>
                 </div>
               </div>
             </CardContent>
@@ -174,91 +176,14 @@ export default function HomePage() {
           <Card className="border-border/60">
             <CardContent className="p-6">
               <Quote className="h-6 w-6 text-primary/40" />
-              <p className="mt-4 text-pretty text-base leading-relaxed">"Preview deployments alone are worth the switch. PRs now feel magical."</p>
+              <p className="mt-4 text-pretty text-base leading-relaxed">"The instant rollbacks saved our Black Friday sale. I will never use another hosting provider."</p>
               <div className="mt-6 flex items-center gap-3">
-                <Avatar className="h-9 w-9"><AvatarFallback>AT</AvatarFallback></Avatar>
+                <Avatar className="h-9 w-9"><AvatarFallback>ER</AvatarFallback></Avatar>
                 <div>
-                  <p className="text-sm font-semibold">Alex T.</p>
-                  <p className="text-xs text-muted-foreground">Fullstack Dev</p>
+                  <p className="text-sm font-semibold">Elena Rodriguez</p>
+                  <p className="text-xs text-muted-foreground">Founder, ShopStack</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </section>
-
-<section className="relative w-full ">
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 md:py-24 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center space-y-4">
-          
-          <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Pricing built for every stage</h2>
-          
-        </div>
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
-          <Card className="relative ">
-            
-            <CardHeader>
-              <CardTitle className="text-xl">Hobby</CardTitle>
-              <CardDescription></CardDescription>
-              <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-4xl font-semibold tracking-tight">0</span>
-                <span className="text-sm text-muted-foreground">mo</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Separator className="mb-6" />
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />100 GB bandwidth</li>
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />1 project</li>
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />Preview deploys</li>
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />Community support</li>
-              </ul>
-              <Button asChild variant="outline" className="mt-6 w-full"><Link href="#">Choose plan</Link></Button>
-            </CardContent>
-          </Card>
-          <Card className="relative ring-2 ring-primary shadow-xl shadow-primary/10 scale-[1.02]">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2"><Badge>Most popular</Badge></div>
-            <CardHeader>
-              <CardTitle className="text-xl">Pro</CardTitle>
-              <CardDescription></CardDescription>
-              <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-4xl font-semibold tracking-tight">29</span>
-                <span className="text-sm text-muted-foreground">mo</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Separator className="mb-6" />
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />Unlimited projects</li>
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />500 GB bandwidth</li>
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />Priority support</li>
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />Custom domains</li>
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />Team collab</li>
-              </ul>
-              <Button asChild variant="default" className="mt-6 w-full"><Link href="#">Choose plan</Link></Button>
-            </CardContent>
-          </Card>
-          <Card className="relative ">
-            
-            <CardHeader>
-              <CardTitle className="text-xl">Enterprise</CardTitle>
-              <CardDescription></CardDescription>
-              <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-4xl font-semibold tracking-tight">199</span>
-                <span className="text-sm text-muted-foreground">mo</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Separator className="mb-6" />
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />Unlimited everything</li>
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />SLA guarantees</li>
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />Custom integrations</li>
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />Dedicated support</li>
-                <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />SOC2 compliance</li>
-              </ul>
-              <Button asChild variant="outline" className="mt-6 w-full"><Link href="#">Choose plan</Link></Button>
             </CardContent>
           </Card>
         </div>
@@ -269,11 +194,11 @@ export default function HomePage() {
       <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-16 sm:px-6 md:py-20 lg:grid-cols-2 lg:px-8">
         <div className="space-y-3">
           <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Ready when you are</h2>
-          <p className="text-pretty text-muted-foreground">Start now and feel the difference within minutes.</p>
+          <p className="text-pretty text-muted-foreground">Join 50,000+ developers building the future of the web on sycord+.</p>
         </div>
         <div className="flex flex-wrap gap-3 lg:justify-end">
-          <Button asChild size="lg"><Link href="/signup">Start Free</Link></Button>
-          <Button asChild size="lg" variant="outline"><Link href="/enterprise">Contact Sales</Link></Button>
+          <Button asChild size="lg"><Link href="/login">Create Account</Link></Button>
+          
         </div>
       </div>
     </section>

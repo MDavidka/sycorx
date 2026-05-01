@@ -12,7 +12,7 @@ export function getDbClient(): Client {
   const authToken = process.env.TURSO_AUTH_TOKEN
   if (!url) {
     throw new Error(
-      "Missing TURSO_DATABASE_URL. Add it to your environment (see .env).",
+      "Missing TURSO_DATABASE_URL. Add it to your deploy environment.",
     )
   }
   client = createClient({ url, authToken })
