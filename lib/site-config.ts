@@ -1,12 +1,12 @@
 import type { Metadata } from "next"
 
 export const siteConfig = {
-  "name": "sycord+",
-  "tagline": "Next-generation hosting for Discord bots and apps.",
-  "description": "High-performance, always-on hosting tailored for Discord developers. Deploy Node.js, Python, and Rust bots in seconds with zero server configuration.",
-  "audience": "Discord bot developers, community managers, and indie hackers.",
+  "name": "sycord",
+  "tagline": "Frictionless Hosting for Modern Apps",
+  "description": "Sycord delivers instant deployments, global edge caching, and zero-config scaling for your web apps, APIs, and static sites. Deploy from Git in seconds with built-in previews and rollbacks.",
+  "audience": "Developers, startups, and agencies building SaaS, e-commerce, and high-traffic apps",
   "category": null,
-  "logoUrl": "https://img.pikbest.com/png-images/20241022/stealth-masked-hacker-gaming-logo-for-gamers_10991543.png!w700wp",
+  "logoUrl": null,
   "logoInitials": "S",
   "navLinks": [
     {
@@ -22,43 +22,54 @@ export const siteConfig = {
       "href": "/pricing"
     },
     {
-      "label": "Contact",
-      "href": "/contact"
+      "label": "Docs",
+      "href": "/docs"
     }
   ],
   "primaryCta": {
     "label": "Deploy Now",
-    "href": "/pricing"
+    "href": "/signup"
   },
   "secondaryCta": {
     "label": "View Docs",
-    "href": "/features"
+    "href": "/docs"
   },
   "footerCta": {
-    "label": "Start Hosting Free",
-    "href": "/pricing"
+    "label": "Start Free Trial",
+    "href": "/signup"
   },
   "socialLinks": [
     {
-      "label": "Twitter",
-      "href": "https://twitter.com"
+      "label": "GitHub",
+      "href": "https://github.com/sycord"
     },
     {
-      "label": "GitHub",
-      "href": "https://github.com"
+      "label": "Twitter",
+      "href": "https://twitter.com/sycord"
     },
     {
       "label": "Discord",
-      "href": "https://discord.com"
+      "href": "https://discord.gg/sycord"
     }
   ],
   "contact": {
-    "email": "support@sycord.plus"
+    "email": "hello@sycord.com"
   },
   "themePreset": "saas",
-  "integrations": [],
-  "needsDatabase": false,
-  "databaseProvider": "none"
+  "integrations": [
+    {
+      "kind": "database",
+      "name": "Turso",
+      "provider": "turso",
+      "reason": "Store user accounts, deployments, billing data, project configs, and usage metrics",
+      "envVars": [
+        "TURSO_DATABASE_URL",
+        "TURSO_AUTH_TOKEN"
+      ]
+    }
+  ],
+  "needsDatabase": true,
+  "databaseProvider": "turso"
 } as const
 
 export type SiteConfig = typeof siteConfig

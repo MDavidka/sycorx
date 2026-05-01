@@ -3,11 +3,11 @@
 // passes and for diffing edits between regenerations.
 export const generatedManifest = {
   "brief": {
-    "projectName": "sycord+",
-    "tagline": "Next-generation hosting for Discord bots and apps.",
-    "description": "High-performance, always-on hosting tailored for Discord developers. Deploy Node.js, Python, and Rust bots in seconds with zero server configuration.",
-    "audience": "Discord bot developers, community managers, and indie hackers.",
-    "voice": "Technical, fast-paced, reliable, and developer-centric.",
+    "projectName": "sycord",
+    "tagline": "Frictionless Hosting for Modern Apps",
+    "description": "Sycord delivers instant deployments, global edge caching, and zero-config scaling for your web apps, APIs, and static sites. Deploy from Git in seconds with built-in previews and rollbacks.",
+    "audience": "Developers, startups, and agencies building SaaS, e-commerce, and high-traffic apps",
+    "voice": "Confident, technical, approachable",
     "themePreset": "saas",
     "navLinks": [
       {
@@ -23,39 +23,38 @@ export const generatedManifest = {
         "href": "/pricing"
       },
       {
-        "label": "Contact",
-        "href": "/contact"
+        "label": "Docs",
+        "href": "/docs"
       }
     ],
     "primaryCta": {
       "label": "Deploy Now",
-      "href": "/pricing"
+      "href": "/signup"
     },
     "secondaryCta": {
       "label": "View Docs",
-      "href": "/features"
+      "href": "/docs"
     },
     "footerCta": {
-      "label": "Start Hosting Free",
-      "href": "/pricing"
+      "label": "Start Free Trial",
+      "href": "/signup"
     },
     "contact": {
-      "email": "support@sycord.plus"
+      "email": "hello@sycord.com"
     },
-    "logoUrl": "https://img.pikbest.com/png-images/20241022/stealth-masked-hacker-gaming-logo-for-gamers_10991543.png!w700wp",
     "logoInitials": "S",
     "socialLinks": [
       {
-        "label": "Twitter",
-        "href": "https://twitter.com"
+        "label": "GitHub",
+        "href": "https://github.com/sycord"
       },
       {
-        "label": "GitHub",
-        "href": "https://github.com"
+        "label": "Twitter",
+        "href": "https://twitter.com/sycord"
       },
       {
         "label": "Discord",
-        "href": "https://discord.com"
+        "href": "https://discord.gg/sycord"
       }
     ]
   },
@@ -111,46 +110,59 @@ export const generatedManifest = {
   "pages": [
     {
       "path": "/",
-      "title": "sycord+ | Discord Bot Hosting Made Simple",
-      "metaTitle": "sycord+ | High-Performance Discord Bot Hosting",
-      "metaDescription": "Deploy your Discord bot in seconds. Zero downtime, infinite scalability, and native support for Node.js, Python, and Go.",
+      "title": "Sycord - Instant Hosting for Modern Apps",
+      "metaTitle": "Sycord - Deploy Web Apps in Seconds",
+      "metaDescription": "Global edge hosting with instant Git deployments, previews, and zero-config scaling. Perfect for SaaS, APIs, and static sites.",
       "sections": [
         {
           "kind": "hero",
           "variant": "saas-dashboard",
-          "description": "Push your code to GitHub and we handle the rest. Get your Discord bot online 24/7 with auto-scaling, built-in DDoS protection, and zero configuration.",
           "primaryCta": {
-            "label": "Start for Free",
-            "href": "/pricing"
+            "label": "Deploy Now",
+            "href": "/signup"
           },
           "secondaryCta": {
-            "label": "Explore Features",
-            "href": "/features"
-          }
-        },
-        {
-          "kind": "logos",
-          "variant": "row",
-          "description": "Everything you need to run modern applications.",
+            "label": "See pricing",
+            "href": "/pricing"
+          },
           "items": [
             {
-              "label": "Node.js",
+              "title": "Connect Git repo",
               "highlighted": false
             },
             {
-              "label": "Python",
+              "title": "One-click deploy",
               "highlighted": false
             },
             {
-              "label": "Rust",
+              "title": "Global CDN ready",
+              "highlighted": false
+            }
+          ]
+        },
+        {
+          "kind": "stats",
+          "variant": "row",
+          "items": [
+            {
+              "label": "ms avg deploy",
+              "value": "247",
               "highlighted": false
             },
             {
-              "label": "Go",
+              "label": "global regions",
+              "value": "12",
               "highlighted": false
             },
             {
-              "label": "Docker",
+              "label": "apps hosted",
+              "value": "50k",
+              "highlighted": false
+            },
+            {
+              "label": "uptime SLA",
+              "value": "99.99",
+              "suffix": "%",
               "highlighted": false
             }
           ]
@@ -158,51 +170,59 @@ export const generatedManifest = {
         {
           "kind": "feature-grid",
           "variant": "bento",
-          "description": "We stripped away the complexity of traditional VPS hosting so you can focus on writing commands, not configuring firewalls.",
           "items": [
             {
-              "title": "1-Click GitHub Deploys",
-              "description": "Connect your repository and we'll automatically build and deploy your bot every time you push to main.",
+              "title": "Instant Git Deployments",
+              "description": "Push to deploy. Automatic builds for Next.js, Nuxt, SvelteKit, Remix, and 50+ frameworks.",
+              "icon": "git-pull-request",
               "highlighted": false
             },
             {
-              "title": "Always-On Reliability",
-              "description": "99.99% uptime guarantee with automatic process restarts if your bot crashes.",
+              "title": "Global Edge Network",
+              "description": "12 regions, 200+ edge locations. Serve users from the closest PoP with sub-50ms latency.",
+              "icon": "globe",
               "highlighted": false
             },
             {
-              "title": "Enterprise DDoS Protection",
-              "description": "Keep your community online. Our edge network absorbs malicious traffic before it reaches your app.",
+              "title": "Preview Deployments",
+              "description": "Every PR gets a unique preview URL. Test changes before they hit production.",
+              "icon": "eye",
               "highlighted": false
             },
             {
-              "title": "Real-time Log Streaming",
-              "description": "Debug issues instantly with a live, searchable stream of your application's console output.",
+              "title": "Zero-Config Scaling",
+              "description": "Auto-scale to zero or millions. Handle traffic spikes without touching config.",
+              "icon": "cpu",
               "highlighted": false
             }
           ]
         },
         {
-          "kind": "process",
-          "variant": "steps",
-          "description": "No SSH keys, no Linux tutorials. Just pure deployment speed.",
+          "kind": "logos",
+          "variant": "row",
           "items": [
             {
-              "title": "Connect GitHub",
-              "description": "Authorize sycord+ to access your bot's repository with read-only permissions.",
-              "eyebrow": "Step 01",
+              "label": "Vercel",
               "highlighted": false
             },
             {
-              "title": "Set Environment Variables",
-              "description": "Securely paste your Discord token and API keys into our encrypted vault.",
-              "eyebrow": "Step 02",
+              "label": "Netlify",
               "highlighted": false
             },
             {
-              "title": "Deploy & Scale",
-              "description": "Click deploy. We provision the container, install dependencies, and start your bot.",
-              "eyebrow": "Step 03",
+              "label": "Stripe",
+              "highlighted": false
+            },
+            {
+              "label": "Supabase",
+              "highlighted": false
+            },
+            {
+              "label": "Auth0",
+              "highlighted": false
+            },
+            {
+              "label": "PlanetScale",
               "highlighted": false
             }
           ]
@@ -210,27 +230,26 @@ export const generatedManifest = {
         {
           "kind": "testimonials",
           "variant": "grid-cards",
-          "description": "Join thousands of developers hosting their communities on sycord+.",
           "items": [
             {
-              "quote": "Switching to sycord+ saved me 10 hours a week in server maintenance. The auto-deploy feature is absolute magic for my workflow.",
-              "author": "Alex Chen",
-              "role": "Creator of ModerationBot",
-              "initials": "AC",
+              "quote": "Sycord cut our deploy times from 8 minutes to 12 seconds. Game changer.",
+              "author": "Sarah K.",
+              "role": "CTO @ Fintech Startup",
+              "initials": "SK",
               "highlighted": false
             },
             {
-              "quote": "We serve over 2M users across 50,000 servers. sycord+ handles our traffic spikes effortlessly without breaking a sweat.",
-              "author": "Sarah Jenkins",
-              "role": "Lead Dev, RPG-Cord",
-              "initials": "SJ",
+              "quote": "Global edge caching without the Vercel price tag. Perfect for our SaaS.",
+              "author": "Mike R.",
+              "role": "Founder @ Agency",
+              "initials": "MR",
               "highlighted": false
             },
             {
-              "quote": "The best hosting platform for Discord bots, period. The real-time logs and environment variable management are top tier.",
-              "author": "Marcus Thorne",
-              "role": "Indie Hacker",
-              "initials": "MT",
+              "quote": "Preview deployments alone are worth the switch. PRs now feel magical.",
+              "author": "Alex T.",
+              "role": "Fullstack Dev",
+              "initials": "AT",
               "highlighted": false
             }
           ]
@@ -238,83 +257,43 @@ export const generatedManifest = {
         {
           "kind": "pricing",
           "variant": "three-tier",
-          "description": "Start for free, upgrade when your community demands it.",
           "items": [
             {
               "title": "Hobby",
-              "price": "$0",
-              "period": "/month",
+              "price": "0",
+              "period": "mo",
               "features": [
-                "512MB RAM",
-                "Shared CPU",
-                "Community Support",
-                "Sleeps after 24h inactivity"
+                "100 GB bandwidth",
+                "1 project",
+                "Preview deploys",
+                "Community support"
               ],
-              "cta": {
-                "label": "Deploy Free",
-                "href": "/pricing"
-              },
               "highlighted": false
             },
             {
               "title": "Pro",
-              "price": "$5",
-              "period": "/month",
+              "price": "29",
+              "period": "mo",
               "features": [
-                "1GB Dedicated RAM",
-                "1 vCPU Core",
-                "Always On (No Sleeping)",
-                "Priority Email Support",
-                "Automated Backups"
+                "Unlimited projects",
+                "500 GB bandwidth",
+                "Priority support",
+                "Custom domains",
+                "Team collab"
               ],
-              "cta": {
-                "label": "Get Pro",
-                "href": "/pricing"
-              },
               "highlighted": true
             },
             {
-              "title": "Scale",
-              "price": "$15",
-              "period": "/month",
+              "title": "Enterprise",
+              "price": "199",
+              "period": "mo",
               "features": [
-                "4GB Dedicated RAM",
-                "2 vCPU Cores",
-                "Custom Domains for APIs",
-                "Advanced Analytics",
-                "24/7 Discord Support"
+                "Unlimited everything",
+                "SLA guarantees",
+                "Custom integrations",
+                "Dedicated support",
+                "SOC2 compliance"
               ],
-              "cta": {
-                "label": "Start Scaling",
-                "href": "/pricing"
-              },
-              "highlighted": false
-            }
-          ]
-        },
-        {
-          "kind": "faq",
-          "variant": "two-column",
-          "description": "Everything you need to know about hosting on sycord+.",
-          "items": [
-            {
-              "title": "Do I need to know Docker to use sycord+?",
-              "description": "Not at all. We automatically detect your language (Node.js, Python, etc.) and build the container for you. If you prefer, you can provide your own Dockerfile.",
-              "highlighted": false
-            },
-            {
-              "title": "Is my bot token secure?",
-              "description": "Yes. Environment variables are encrypted at rest using AES-256 and are only decrypted at runtime inside your isolated container.",
-              "highlighted": false
-            },
-            {
-              "title": "Can I host a database here?",
-              "description": "sycord+ is optimized for stateless application hosting. We recommend using managed database providers like MongoDB Atlas or Supabase alongside our platform.",
-              "highlighted": false
-            },
-            {
-              "title": "What happens if I exceed my RAM limit?",
-              "description": "Your bot will automatically restart to prevent system instability. We'll send you an alert so you can optimize your code or upgrade your plan.",
               "highlighted": false
             }
           ]
@@ -322,66 +301,152 @@ export const generatedManifest = {
         {
           "kind": "cta",
           "variant": "split",
-          "description": "Join 10,000+ developers building the future of Discord communities.",
           "primaryCta": {
-            "label": "Create Account",
-            "href": "/pricing"
+            "label": "Start Free",
+            "href": "/signup"
           },
           "secondaryCta": {
-            "label": "Read Documentation",
-            "href": "/features"
+            "label": "Contact Sales",
+            "href": "/enterprise"
           }
         }
       ]
     },
     {
       "path": "/features",
-      "title": "Features | sycord+",
-      "metaTitle": "Platform Features | sycord+",
-      "metaDescription": "Explore the powerful features that make sycord+ the best place to host your Discord bots and community applications.",
+      "title": "Features - Sycord Hosting",
+      "metaTitle": "All Sycord Features",
+      "metaDescription": "Explore instant deployments, global edge caching, preview URLs, and everything else Sycord offers.",
       "sections": [
         {
           "kind": "hero",
-          "variant": "centered",
-          "description": "We handle the infrastructure so you can focus on building the best experience for your users.",
-          "primaryCta": {
-            "label": "Start Building",
-            "href": "/pricing"
-          }
+          "variant": "centered"
+        },
+        {
+          "kind": "feature-grid",
+          "variant": "alternating",
+          "items": [
+            {
+              "title": "Git-Based CI/CD",
+              "description": "Connect GitHub, GitLab, or Bitbucket. Deploy on push. Rollback with one click.",
+              "highlighted": false
+            },
+            {
+              "title": "Framework Auto-Detection",
+              "description": "Next.js, Nuxt, SvelteKit, Astro, Remix. No build config needed.",
+              "highlighted": false
+            },
+            {
+              "title": "Preview Every PR",
+              "description": "Unique URLs for every pull request. Share with team or clients.",
+              "highlighted": false
+            },
+            {
+              "title": "Global Edge Caching",
+              "description": "Smart caching at 200+ edge locations. Invalidate on deploy.",
+              "highlighted": false
+            }
+          ]
+        },
+        {
+          "kind": "process",
+          "variant": "timeline",
+          "items": [
+            {
+              "title": "Connect Git",
+              "description": "Authorize your repo. Sycord detects framework and sets up build.",
+              "eyebrow": "Step 01",
+              "highlighted": false
+            },
+            {
+              "title": "Deploy Preview",
+              "description": "Push to any branch. Get instant preview URL in 12 seconds.",
+              "eyebrow": "Step 02",
+              "highlighted": false
+            },
+            {
+              "title": "Promote to Production",
+              "description": "Merge to main. Deploy goes live globally in under 2 seconds.",
+              "eyebrow": "Step 03",
+              "highlighted": false
+            }
+          ]
         },
         {
           "kind": "feature-grid",
           "variant": "icon-grid",
-          "description": "A comprehensive suite of tools designed specifically for modern bot developers.",
           "items": [
             {
-              "title": "Global Edge Network",
-              "description": "Your bot's API responds in milliseconds with our globally distributed edge routing.",
+              "title": "CLI Deployments",
+              "description": "sycord deploy from anywhere",
+              "icon": "terminal",
               "highlighted": false
             },
             {
-              "title": "Persistent Storage",
-              "description": "Attach high-speed NVMe volumes to your containers for local SQLite databases or file storage.",
-              "highlighted": false
-            },
-            {
-              "title": "Cron Jobs",
-              "description": "Schedule recurring tasks natively through our dashboard without writing complex interval logic.",
-              "highlighted": false
-            },
-            {
-              "title": "Team Collaboration",
-              "description": "Invite co-developers to your project with granular role-based access controls.",
+              "title": "Environment Variables",
+              "description": "Encrypted at rest. Preview & prod environments",
+              "icon": "lock",
               "highlighted": false
             },
             {
               "title": "Custom Domains",
-              "description": "Map your own domain to your bot's web dashboard or API endpoints with automatic SSL.",
+              "description": "SSL included. DNS propagation in 60s",
+              "icon": "globe2",
+              "highlighted": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/pricing",
+      "title": "Pricing - Sycord",
+      "metaTitle": "Transparent Hosting Pricing",
+      "metaDescription": "Hobby, Pro, Enterprise plans. Pay for bandwidth used. No surprises.",
+      "sections": [
+        {
+          "kind": "hero",
+          "variant": "gradient-card"
+        },
+        {
+          "kind": "pricing",
+          "variant": "three-tier",
+          "items": [
+            {
+              "title": "Hobby",
+              "price": "0",
+              "period": "mo",
+              "features": [
+                "100 GB bandwidth/mo",
+                "1 project",
+                "Preview deployments",
+                "Community Discord"
+              ],
               "highlighted": false
             },
             {
-              "title": "Uptime Monitoring",
-              "description": "Built-in ping checks and webhook alerts notify you the second your bot goes offline.",
+              "title": "Pro",
+              "price": "29",
+              "period": "mo",
+              "features": [
+                "500 GB bandwidth",
+                "Unlimited projects",
+                "Team collaboration",
+                "Priority email",
+                "Custom domains"
+              ],
+              "highlighted": true
+            },
+            {
+              "title": "Enterprise",
+              "price": "Custom",
+              "features": [
+                "Unlimited bandwidth",
+                "99.99% SLA",
+                "SOC2 compliance",
+                "VPC peering",
+                "Dedicated IPS"
+              ],
               "highlighted": false
             }
           ]
@@ -389,162 +454,82 @@ export const generatedManifest = {
         {
           "kind": "comparison",
           "variant": "table",
-          "description": "See how we stack up against traditional hosting methods.",
           "items": [
             {
-              "title": "Setup Time",
-              "description": "sycord+: < 1 minute | VPS: Hours | Heroku: 10 minutes",
               "highlighted": false
             },
             {
-              "title": "Discord Native",
-              "description": "sycord+: Yes | VPS: No | Heroku: No",
               "highlighted": false
             },
             {
-              "title": "Maintenance",
-              "description": "sycord+: Zero | VPS: High | Heroku: Low",
               "highlighted": false
             },
             {
-              "title": "Cost Predictability",
-              "description": "sycord+: Fixed Flat Rate | VPS: Fixed | Heroku: Usage Based",
               "highlighted": false
             }
           ]
         },
         {
           "kind": "cta",
-          "variant": "banner",
-          "description": "Deploy your first bot today for free.",
+          "variant": "boxed-card",
           "primaryCta": {
-            "label": "Deploy Now",
-            "href": "/pricing"
+            "label": "Get Pro",
+            "href": "/signup"
           }
         }
       ]
     },
     {
-      "path": "/pricing",
-      "title": "Pricing | sycord+",
-      "metaTitle": "Simple, Transparent Pricing | sycord+",
-      "metaDescription": "Choose the perfect plan for your Discord bot. From free hobby tiers to powerful dedicated resources for verified bots.",
+      "path": "/docs",
+      "title": "Documentation - Sycord",
+      "metaTitle": "Sycord Docs - Get Started",
+      "metaDescription": "Deploy your first app in 2 minutes. Full API reference and guides.",
       "sections": [
         {
           "kind": "hero",
-          "variant": "split",
-          "description": "Whether you're testing a new idea or running a verified bot in 100,000 servers, we have a plan that fits your needs.",
-          "primaryCta": {
-            "label": "View Plans",
-            "href": "#plans"
-          }
+          "variant": "split"
         },
         {
-          "kind": "pricing",
-          "variant": "two-tier-toggle",
-          "description": "Upgrade instantly as your bot grows.",
+          "kind": "process",
+          "variant": "steps",
           "items": [
             {
-              "title": "Pro",
-              "price": "$5",
-              "period": "/month",
-              "features": [
-                "1GB Dedicated RAM",
-                "1 vCPU Core",
-                "Always On",
-                "Automated Backups",
-                "Community Support"
-              ],
-              "cta": {
-                "label": "Get Pro",
-                "href": "/contact"
-              },
+              "title": "Create Account",
+              "description": "Sign up and connect your GitHub account.",
+              "eyebrow": "Step 1",
               "highlighted": false
             },
             {
-              "title": "Scale",
-              "price": "$15",
-              "period": "/month",
-              "features": [
-                "4GB Dedicated RAM",
-                "2 vCPU Cores",
-                "Custom Domains",
-                "Advanced Analytics",
-                "Priority 24/7 Support"
-              ],
-              "cta": {
-                "label": "Start Scaling",
-                "href": "/contact"
-              },
-              "highlighted": true
+              "title": "Pick a Project",
+              "description": "Select any repo. We'll auto-detect the framework.",
+              "eyebrow": "Step 2",
+              "highlighted": false
+            },
+            {
+              "title": "Deploy Live",
+              "description": "Push to main. Your site is live globally.",
+              "eyebrow": "Step 3",
+              "highlighted": false
             }
           ]
         },
         {
-          "kind": "faq",
-          "variant": "accordion",
-          "description": "Common questions about billing and limits.",
+          "kind": "feature-grid",
+          "variant": "cards",
           "items": [
             {
-              "title": "Can I upgrade or downgrade at any time?",
-              "description": "Yes, your billing is prorated. If you upgrade halfway through the month, you only pay the difference for the remaining days.",
+              "title": "Next.js Deployment",
+              "description": "Static, SSR, App Router, Middleware",
               "highlighted": false
             },
             {
-              "title": "Are there any hidden bandwidth fees?",
-              "description": "No. All plans include unmetered bandwidth for standard Discord bot operations. If you are hosting a high-traffic API, fair use policies apply.",
+              "title": "API Routes",
+              "description": "Serverless functions with global edge",
               "highlighted": false
             },
             {
-              "title": "Do you offer refunds?",
-              "description": "We offer a 7-day money-back guarantee on all paid plans. If you're not satisfied, just let us know.",
-              "highlighted": false
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "path": "/contact",
-      "title": "Contact Us | sycord+",
-      "metaTitle": "Contact Support & Sales | sycord+",
-      "metaDescription": "Get in touch with the sycord+ team for technical support, enterprise inquiries, or general questions.",
-      "sections": [
-        {
-          "kind": "hero",
-          "variant": "centered",
-          "description": "Need technical support or have a question about our enterprise plans? Drop us a message.",
-          "primaryCta": {
-            "label": "Fill out Form",
-            "href": "#contact-form"
-          }
-        },
-        {
-          "kind": "contact",
-          "variant": "split-form",
-          "description": "Fill out the form below and our team will get back to you within 24 hours."
-        },
-        {
-          "kind": "stats",
-          "variant": "row",
-          "description": "We take reliability and support seriously.",
-          "items": [
-            {
-              "label": "Uptime Guarantee",
-              "value": "99.99",
-              "suffix": "%",
-              "highlighted": false
-            },
-            {
-              "label": "Hour Response Time",
-              "value": "24",
-              "suffix": "h",
-              "highlighted": false
-            },
-            {
-              "label": "Active Bots Hosted",
-              "value": "10",
-              "suffix": "k+",
+              "title": "Custom Domains",
+              "description": "SSL + DNS setup in 60 seconds",
               "highlighted": false
             }
           ]
@@ -552,11 +537,39 @@ export const generatedManifest = {
       ]
     }
   ],
-  "needsDatabase": false,
-  "databaseProvider": "none",
-  "integrations": [],
-  "requiredEnvVars": [],
-  "unconnectedIntegrations": []
+  "needsDatabase": true,
+  "databaseProvider": "turso",
+  "integrations": [
+    {
+      "kind": "database",
+      "name": "Turso",
+      "provider": "turso",
+      "reason": "Store user accounts, deployments, billing data, project configs, and usage metrics",
+      "envVars": [
+        "TURSO_DATABASE_URL",
+        "TURSO_AUTH_TOKEN"
+      ]
+    }
+  ],
+  "requiredEnvVars": [
+    {
+      "key": "TURSO_DATABASE_URL",
+      "purpose": "Turso — Store user accounts, deployments, billing data, project configs, and usage metrics",
+      "provider": "turso",
+      "required": true,
+      "integration": "Turso"
+    },
+    {
+      "key": "TURSO_AUTH_TOKEN",
+      "purpose": "Turso — Store user accounts, deployments, billing data, project configs, and usage metrics",
+      "provider": "turso",
+      "required": true,
+      "integration": "Turso"
+    }
+  ],
+  "unconnectedIntegrations": [
+    "Auth"
+  ]
 } as const
 
 export type GeneratedManifest = typeof generatedManifest
